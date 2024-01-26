@@ -20,8 +20,12 @@ const LCP_BLOCKS = []; // add your LCP blocks to the list
  * @param {Element} main The container element
  */
 function buildHeroBlock(main) {
-  const h1 = main.querySelector('h1');
-  const picture = main.querySelector('picture');
+  const firstSection = main.querySelector(':scope > div');
+  if (firstSection) {
+    const h1 = firstSection.querySelector('h1');
+    const picture = firstSection.querySelector('picture');
+  }
+
   // eslint-disable-next-line no-bitwise
   if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
     const section = document.createElement('div');
@@ -93,6 +97,26 @@ async function loadEager(doc) {
   }
 }
 
+function loadHeaderAndFooter(doc) {
+  const header = doc.querySelector('header');
+  const footer = doc.querySelector('footer');
+
+  header.style.visibility = 'hidden';
+  footer.style.visibility = 'hidden';
+
+  const headerLoaded = loadHeader(header);
+  const footerLoaded = loadFooter(footer);
+
+  headerLoaded.then(() => {
+    header.style.visibility = null;
+  });
+  footerLoaded.then(() => {
+    footer.style.visibility = null;
+  });
+
+  return Promise.all([headerLoaded, footerLoaded]);
+}
+
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
@@ -105,11 +129,20 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadHeader(doc.querySelector('header'));
-  loadFooter(doc.querySelector('footer'));
+  // no need to await any of these individually
+  // but want them all to complete before moving on to delayed phase
+  const lazyPromises = [];
 
-  loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
-  loadFonts();
+  lazyPromises.push(loadHeaderAndFooter(doc));
+
+
+  lazyPromises.push(headerLoaded);
+  lazyPromises.push(footerLoaded);
+
+  lazyPromises.push(loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`));
+  lazyPromises(loadFonts());
+
+  await Promise.all(lazyPromises);
 
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
