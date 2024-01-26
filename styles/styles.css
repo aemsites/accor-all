@@ -10,6 +10,17 @@
  * governing permissions and limitations under the License.
  */
 
+ /* reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+/* end reset */
+
 :root {
   /* colors */
   --link-color: #035fe6;
