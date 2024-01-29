@@ -3,7 +3,6 @@ import {
   buildBlock,
   loadHeader,
   loadFooter,
-  decorateButtons,
   decorateIcons,
   decorateSections,
   decorateBlocks,
@@ -11,27 +10,35 @@ import {
   waitForLCP,
   loadBlocks,
   loadCSS,
+  getMetadata,
+  toClassName,
 } from './aem.js';
+import {
+  checkDomain,
+  hasWrapper,
+  linkTextIncludesHref,
+  rewriteLinkUrl,
+  wrapImgsInLinks,
+} from './utils.js';
+import {
+  p,
+} from './dom-helpers.js';
 
-const LCP_BLOCKS = []; // add your LCP blocks to the list
+const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
 
 /**
- * Builds hero block and prepends to main in a new section.
+ * Builds fragment blocks from links to fragments
  * @param {Element} main The container element
  */
-function buildHeroBlock(main) {
-  const firstSection = main.querySelector(':scope > div');
-  if (firstSection) {
-    const h1 = firstSection.querySelector('h1');
-    const picture = firstSection.querySelector('picture');
-  }
-
-  // eslint-disable-next-line no-bitwise
-  if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
-    const section = document.createElement('div');
-    section.append(buildBlock('hero', { elems: [picture, h1] }));
-    main.prepend(section);
-  }
+function buildFragmentBlocks(main) {
+  main.querySelectorAll('a[href]').forEach((a) => {
+    const url = new URL(a.href);
+    const domainCheck = checkDomain(url);
+    if (domainCheck.isKnown && linkTextIncludesHref(a) && url.pathname.includes('/fragments/')) {
+      const block = buildBlock('fragment', p(a.cloneNode(true)));
+      a.replaceWith(block);
+    }
+  });
 }
 
 /**
@@ -50,9 +57,12 @@ async function loadFonts() {
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
-function buildAutoBlocks(main) {
+function buildAutoBlocks(main, templateModule = undefined) {
   try {
-    buildHeroBlock(main);
+    buildFragmentBlocks(main);
+    if (templateModule && templateModule.default) {
+      templateModule.default(main);
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -60,17 +70,93 @@ function buildAutoBlocks(main) {
 }
 
 /**
+ * add block level wrappers to all block content columns
+ * @param {Element} main the main element
+ */
+function addBlockWrappers(main) {
+  main.querySelectorAll('.block').forEach((block) => {
+    block.querySelectorAll(':scope > div').forEach((row) => {
+      row.querySelectorAll(':scope > div').forEach((col) => {
+        if (!hasWrapper(col)) {
+          const wrapper = p(col.children);
+          col.append(wrapper);
+        }
+      });
+    });
+  });
+}
+
+/**
+ * decorate all links, includes creating buttons, making links relative, etc.
+ * @param {Element} main the main element
+ */
+function decorateLinks(main) {
+  main.querySelectorAll('a').forEach((a) => {
+    a.title = a.title || a.textContent;
+    rewriteLinkUrl(a);
+    if (!linkTextIncludesHref(a) && !a.querySelector('img')) {
+      const up = a.parentElement;
+      const twoup = a.parentElement.parentElement;
+      if (up.childNodes.length === 1 && (up.tagName === 'P' || up.tagName === 'DIV')) {
+        a.className = 'button'; // default
+        up.classList.add('button-container');
+      }
+      if (
+        up.childNodes.length === 1
+        && up.tagName === 'STRONG'
+        && twoup.childNodes.length === 1
+        && twoup.tagName === 'P'
+      ) {
+        a.className = 'button primary';
+        twoup.classList.add('button-container');
+      }
+      if (
+        up.childNodes.length === 1
+        && up.tagName === 'EM'
+        && twoup.childNodes.length === 1
+        && twoup.tagName === 'P'
+      ) {
+        a.className = 'button secondary';
+        twoup.classList.add('button-container');
+      }
+    }
+  });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
 // eslint-disable-next-line import/prefer-default-export
-export function decorateMain(main) {
+export function decorateMain(main, templateModule) {
   // hopefully forward compatible button decoration
-  decorateButtons(main);
+  wrapImgsInLinks(main);
+  decorateLinks(main);
   decorateIcons(main);
-  buildAutoBlocks(main);
+  buildAutoBlocks(main, templateModule);
   decorateSections(main);
   decorateBlocks(main);
+  addBlockWrappers(main);
+}
+
+const validTemplates = [];
+async function loadTemplate() {
+  const templateName = toClassName(getMetadata('template'));
+  if (templateName && validTemplates.includes(templateName)) {
+    try {
+      const cssLoaded = loadCSS(`${window.hlx.codeBasePath}/template/${templateName}/${templateName}.css`);
+      const mod = await import(
+        `${window.hlx.codeBasePath}/templates/${templateName}/${templateName}.js`
+      );
+      await cssLoaded;
+      return mod;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(`failed to load template ${templateName}`, error);
+    }
+  }
+
+  return undefined;
 }
 
 /**
@@ -80,9 +166,10 @@ export function decorateMain(main) {
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
+  const templateModule = await loadTemplate();
   const main = doc.querySelector('main');
   if (main) {
-    decorateMain(main);
+    decorateMain(main, templateModule);
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
@@ -134,13 +221,8 @@ async function loadLazy(doc) {
   const lazyPromises = [];
 
   lazyPromises.push(loadHeaderAndFooter(doc));
-
-
-  lazyPromises.push(headerLoaded);
-  lazyPromises.push(footerLoaded);
-
   lazyPromises.push(loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`));
-  lazyPromises(loadFonts());
+  lazyPromises.push(loadFonts());
 
   await Promise.all(lazyPromises);
 
