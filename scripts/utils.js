@@ -1,0 +1,129 @@
+export const PRODUCTION_DOMAINS = ['all.accor.com'];
+
+/**
+ * Checks a url to determine if it is a known domain.
+ * @param {string | URL} url the url to check
+ * @returns {Object} an object with properties indicating the urls domain types.
+ */
+export function checkDomain(url) {
+  const urlToCheck = typeof url === 'string' ? new URL(url) : url;
+
+  const isProd = PRODUCTION_DOMAINS.some((host) => urlToCheck.hostname.includes(host));
+  const isHlx = ['hlx.page', 'hlx.live', 'aem.page', 'aem.live'].some((host) => urlToCheck.hostname.includes(host));
+  const isLocal = urlToCheck.hostname.includes('localhost');
+  const isPreview = isLocal || urlToCheck.hostname.includes('hlx.page') || urlToCheck.hostname.includes('aem.page');
+  const isKnown = isProd || isHlx || isLocal;
+  const isExternal = !isKnown;
+  return {
+    isProd,
+    isHlx,
+    isLocal,
+    isKnown,
+    isExternal,
+    isPreview,
+  };
+}
+
+let browserDomainCheck;
+/**
+ * @returns {Object} an object with properties indicating the urls domain types.
+ */
+export function checkBrowserDomain() {
+  if (!browserDomainCheck) {
+    browserDomainCheck = checkDomain(window.location);
+  }
+  return browserDomainCheck;
+}
+
+/**
+ * Mofiies a link element to be relative if it is a local link.
+ * @param {Element} a the anchor (link) element
+ * @returns {Element} the modified anchor element
+ */
+export function rewriteLinkUrl(a) {
+  const url = new URL(a.href);
+  const domainCheck = checkDomain(url);
+  // protect against maito: links or other weirdness
+  const isHttp = url.protocol === 'https:' || url.protocol === 'http:';
+
+  if (isHttp && domainCheck.isKnown) {
+    // local links are rewritten to be relative
+    a.href = `${url.pathname}${url.search}${url.hash}`;
+  } else if (isHttp && domainCheck.isExternal) {
+    // non local open in a new tab
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+  }
+
+  return a;
+}
+
+/**
+ * check if link text is same as the href
+ * @param {Element} link the link element
+ * @returns {boolean} true or false
+ */
+export function linkTextIncludesHref(link) {
+  const href = link.getAttribute('href');
+  const textcontent = link.textContent;
+
+  return textcontent.includes(href);
+}
+
+/**
+ * Wraps images followed by links within a matching <a> tag.
+ * @param {Element} container The container element
+ */
+export function wrapImgsInLinks(container) {
+  const pictures = container.querySelectorAll('picture');
+  pictures.forEach((pic) => {
+    // need to deal with 2 use cases here
+    // CASE ONE: <picture><br/><a>
+    if (pic.nextElementSibling && pic.nextElementSibling.tagName === 'BR'
+      && pic.nextElementSibling.nextElementSibling && pic.nextElementSibling.nextElementSibling.tagName === 'A') {
+      const link = pic.nextElementSibling.nextElementSibling;
+      if (linkTextIncludesHref(link)) {
+        pic.nextElementSibling.remove();
+        link.innerHTML = pic.outerHTML;
+        pic.replaceWith(link);
+        return;
+      }
+    }
+    // END CASE ONE
+
+    // CASE TWO: <p><picture></p><p><a></p>
+    const parent = pic.parentNode;
+    if (!parent.nextElementSibling) {
+      return;
+    }
+    const nextSibling = parent.nextElementSibling;
+    if (parent.tagName !== 'P' || nextSibling.tagName !== 'P' || nextSibling.children.length > 1) {
+      return;
+    }
+    const link = nextSibling.querySelector('a');
+    if (link && linkTextIncludesHref(link)) {
+      link.parentElement.remove();
+      link.innerHTML = pic.outerHTML;
+      pic.replaceWith(link);
+    }
+    // END CASE TWO
+  });
+}
+
+/**
+ * Returns the true origin of the current page in the browser.
+ * If the page is running in a iframe with srcdoc, the ancestor origin is returned.
+ * @returns {String} The true origin
+ */
+export function getOrigin() {
+  return window.location.href === 'about:srcdoc' ? window.parent.location.origin : window.location.origin;
+}
+
+/**
+ * Checks if an element has a block-level wrapper element inside of it (usually a <p> tag).
+ * @param {Element} el the element to check
+ * @returns {boolean} true or false
+ */
+export function hasWrapper(el) {
+  return !!el.firstElementChild && window.getComputedStyle(el.firstElementChild).display === 'block';
+}
