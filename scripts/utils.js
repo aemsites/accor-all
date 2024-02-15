@@ -1,5 +1,6 @@
 export const PRODUCTION_DOMAINS = ['all.accor.com'];
 
+const domainCheckCache = {};
 /**
  * Checks a url to determine if it is a known domain.
  * @param {string | URL} url the url to check
@@ -8,31 +9,34 @@ export const PRODUCTION_DOMAINS = ['all.accor.com'];
 export function checkDomain(url) {
   const urlToCheck = typeof url === 'string' ? new URL(url) : url;
 
-  const isProd = PRODUCTION_DOMAINS.some((host) => urlToCheck.hostname.includes(host));
-  const isHlx = ['hlx.page', 'hlx.live', 'aem.page', 'aem.live'].some((host) => urlToCheck.hostname.includes(host));
-  const isLocal = urlToCheck.hostname.includes('localhost');
-  const isPreview = isLocal || urlToCheck.hostname.includes('hlx.page') || urlToCheck.hostname.includes('aem.page');
-  const isKnown = isProd || isHlx || isLocal;
-  const isExternal = !isKnown;
-  return {
-    isProd,
-    isHlx,
-    isLocal,
-    isKnown,
-    isExternal,
-    isPreview,
-  };
+  let result = domainCheckCache[urlToCheck.hostname];
+  if (!result) {
+    const isProd = PRODUCTION_DOMAINS.some((host) => urlToCheck.hostname.includes(host));
+    const isHlx = ['hlx.page', 'hlx.live', 'aem.page', 'aem.live'].some((host) => urlToCheck.hostname.includes(host));
+    const isLocal = urlToCheck.hostname.includes('localhost');
+    const isPreview = isLocal || urlToCheck.hostname.includes('hlx.page') || urlToCheck.hostname.includes('aem.page');
+    const isKnown = isProd || isHlx || isLocal;
+    const isExternal = !isKnown;
+    result = {
+      isProd,
+      isHlx,
+      isLocal,
+      isKnown,
+      isExternal,
+      isPreview,
+    };
+
+    domainCheckCache[urlToCheck.hostname] = result;
+  }
+
+  return result;
 }
 
-let browserDomainCheck;
 /**
  * @returns {Object} an object with properties indicating the urls domain types.
  */
 export function checkBrowserDomain() {
-  if (!browserDomainCheck) {
-    browserDomainCheck = checkDomain(window.location);
-  }
-  return browserDomainCheck;
+  return checkDomain(window.location);
 }
 
 /**
@@ -45,11 +49,12 @@ export function rewriteLinkUrl(a) {
   const domainCheck = checkDomain(url);
   // protect against maito: links or other weirdness
   const isHttp = url.protocol === 'https:' || url.protocol === 'http:';
+  if (!isHttp) return a;
 
-  if (isHttp && domainCheck.isKnown) {
+  if (domainCheck.isKnown) {
     // local links are rewritten to be relative
     a.href = `${url.pathname}${url.search}${url.hash}`;
-  } else if (isHttp && domainCheck.isExternal) {
+  } else if (domainCheck.isExternal) {
     // non local open in a new tab
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
