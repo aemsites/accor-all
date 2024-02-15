@@ -8,6 +8,65 @@ const getMetadata = (name, document) => {
   return meta || '';
 };
 
+const toClassName = (name) => {
+  if (typeof name === 'string') {
+    const clsName = name.toLowerCase()
+      .replace(/[^0-9a-z]/gi, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+    return clsName;
+  }
+
+  return '';
+};
+
+const convertBlocksToTables = (main, document) => {
+  main.querySelectorAll('.block').forEach((block) => {
+    const cells = [];
+    const blockName = `${block.dataset.blockName}${block.dataset.variants ? ` (${block.dataset.variants})` : ''}`;
+    cells.push([blockName]);
+
+    [...block.children].forEach((row) => {
+      const rowCell = [];
+      [...row.children].forEach((col) => {
+        rowCell.push(col);
+      });
+      cells.push(rowCell);
+    });
+
+    const table = WebImporter.DOMUtils.createTable(cells, document);
+    block.replaceWith(table);
+  });
+};
+
+const createBlock = ({ blockname, variants, cells }, document) => {
+  const block = document.createElement('div');
+  block.className = `block ${toClassName(blockname)}`;
+  block.dataset.blockName = blockname;
+  if (variants) {
+    variants.forEach((variant) => {
+      block.classList.add(toClassName(variant));
+    });
+    block.dataset.variants = variants.join(', ');
+  }
+  let rowCount = 0;
+  let colCount = 0;
+  cells.forEach((row) => {
+    const rowEl = document.createElement('div');
+    block.append(rowEl);
+    rowCount += 1;
+    if (row.length > colCount) colCount = row.length;
+    row.forEach((col) => {
+      const colEl = document.createElement('div');
+      colEl.append(col);
+      rowEl.append(colEl);
+    });
+  });
+  block.dataset.rows = rowCount;
+  block.dataset.cols = colCount;
+  return block;
+};
+
 const createMetadata = (document) => {
   const meta = {};
 
@@ -101,102 +160,139 @@ const buildColumnRow = (row, cells, document, reverse = false) => {
   cells.push((reverse ? [content, img] : [img, content]));
 };
 
-const buildZPatterns = (main, document) => {
-  let zPatternLR = main.querySelector('.one-bloc-left-pics + .one-bloc-right-pics');
-  while (zPatternLR) {
-    const zDiv = document.createElement('div');
-    zPatternLR.previousElementSibling.before(zDiv);
+const combineSubsequentBlocks = (main, blockName) => {
+  let keepCombining = true;
+  while (keepCombining) {
+    const secondCols = main.querySelector(`.${blockName} + .${blockName}`);
+    if (secondCols) {
+      const firstCols = secondCols.previousElementSibling;
+      if ((firstCols.dataset.variants === secondCols.dataset.variants)
+        && (firstCols.dataset.cols === secondCols.dataset.cols)) {
+        [...secondCols.children].forEach((row) => {
+          firstCols.append(row);
+        });
+        secondCols.remove();
+      } else {
+        keepCombining = false;
+      }
+    } else {
+      keepCombining = false;
+    }
+  }
+};
+
+const buildAccordions = (main, document) => {
+  main.querySelectorAll('.accordion').forEach((el) => {
     const cells = [
-      ['Columns (Z-Pattern)'],
     ];
 
-    let moreRows = true;
-    let curRow = zPatternLR.previousElementSibling;
-    while (moreRows) {
-      const curLeft = curRow.classList.contains('one-bloc-left-pics');
-      buildColumnRow(curRow, cells, document);
+    el.querySelectorAll('.accordion__item').forEach((item) => {
+      const row = [item.querySelector('.accordion__title'), item.querySelector('.accordion__content')];
+      cells.push(row);
+    });
 
-      const nextRow = curRow.nextElementSibling;
-      moreRows = curLeft ? nextRow.classList.contains('one-bloc-right-pics') : curRow.classList.contains('one-bloc-left-pics');
-      curRow.remove();
-      curRow = nextRow;
+    const block = createBlock({
+      blockname: 'Accordion',
+      cells,
+    }, document);
+    block.dataset.originalBlock = 'accordion';
+    el.replaceWith(block);
+  });
+
+  combineSubsequentBlocks(main, 'accordion');
+};
+
+const buildVideos = (main, document) => {
+  main.querySelectorAll('.bloc-video').forEach((video) => {
+    const cells = [];
+
+    const videoSource = video.querySelector('video source')?.src;
+    if (videoSource) {
+      const sourceUrl = new URL(videoSource);
+      const link = document.createElement('a');
+      link.textContent = `https://all.accor.com${sourceUrl.pathname}`;
+      link.href = `https://all.accor.com${sourceUrl.pathname}`;
+      cells.push([link]);
     }
 
-    const block = WebImporter.DOMUtils.createTable(cells, document);
-    block.dataset.blockName = 'columns z-pattern';
-    zDiv.append(block);
-    zPatternLR = main.querySelector('.one-bloc-left-pics + .one-bloc-right-pics');
-  }
-
-  let zPatternRL = main.querySelector('.one-bloc-right-pics + .one-bloc-left-pics');
-  while (zPatternRL) {
-    const zDiv = document.createElement('div');
-    zPatternRL.previousElementSibling.before(zDiv);
-    const cells = [
-      ['Columns (Z-Pattern, Reverse)'],
-    ];
-
-    let moreRows = true;
-    let curRow = zPatternRL.previousElementSibling;
-    while (moreRows) {
-      const curLeft = curRow.classList.contains('one-bloc-left-pics');
-      buildColumnRow(curRow, cells, document);
-
-      const nextRow = curRow.nextElementSibling;
-      moreRows = curLeft ? nextRow.classList.contains('one-bloc-right-pics') : curRow.classList.contains('one-bloc-left-pics');
-      curRow.remove();
-      curRow = nextRow;
+    const details = video.querySelector('details');
+    if (details) {
+      cells.push([details]);
     }
 
-    const block = WebImporter.DOMUtils.createTable(cells, document);
-    block.dataset.blockName = 'columns z-pattern';
-    zDiv.append(block);
-    zPatternRL = main.querySelector('.one-bloc-right-pics + .one-bloc-left-pics');
-  }
+    const block = createBlock({
+      blockname: 'Video',
+      cells,
+    }, document);
+    block.dataset.originalBlock = 'bloc-video';
+    video.replaceWith(block);
+  });
 };
 
 const buildImageColumns = (main, document) => {
   main.querySelectorAll('.one-bloc-left-pics').forEach((el) => {
-    const cells = [
-      ['Columns'],
-    ];
+    const cells = [];
     buildColumnRow(el, cells, document);
 
-    const block = WebImporter.DOMUtils.createTable(cells, document);
-    block.dataset.blockName = 'columns';
+    const block = createBlock({
+      blockname: 'Columns',
+      cells,
+    }, document);
+    block.dataset.originalBlock = 'one-bloc-left-pics';
     el.replaceWith(block);
   });
 
   main.querySelectorAll('.one-bloc-right-pics').forEach((el) => {
-    const cells = [
-      ['Columns'],
-    ];
+    const cells = [];
     buildColumnRow(el, cells, document, true);
 
-    const block = WebImporter.DOMUtils.createTable(cells, document);
-    block.dataset.blockName = 'columns';
+    const block = createBlock({
+      blockname: 'Columns',
+      cells,
+    }, document);
+    block.dataset.originalBlock = 'one-bloc-right-pics';
     el.replaceWith(block);
   });
+
+  combineSubsequentBlocks(main, 'columns');
 };
 
 const buildCards = (main, document) => {
   main.querySelectorAll('.row-bloc-three').forEach((el) => {
-    const cells = [
-      ['Cards'],
-    ];
+    const cells = [];
 
     el.querySelectorAll('.three-bloc').forEach((card) => {
       cells.push([card.querySelector('.three-bloc-pics'), card.querySelector('.three-bloc-desc')]);
     });
-    const block = WebImporter.DOMUtils.createTable(cells, document);
-    block.dataset.blockName = 'cards';
+    const block = createBlock({
+      blockname: 'Cards',
+      cells,
+    }, document);
+    block.dataset.originalBlock = 'row-bloc-three';
+    el.replaceWith(block);
+  });
+
+  main.querySelectorAll('.row-bloc-two').forEach((el) => {
+    const cells = [];
+
+    el.querySelectorAll('.two-bloc').forEach((card) => {
+      cells.push([card.querySelector('.two-bloc-pics'), card.querySelector('.two-bloc-desc')]);
+    });
+    const block = createBlock({
+      blockname: 'Cards',
+      variants: ['Two Columns'],
+      cells,
+    }, document);
+    block.dataset.originalBlock = 'row-bloc-two';
     el.replaceWith(block);
   });
 
   main.querySelectorAll('.push-area').forEach((el) => {
-    const cells = [
-      ['Cards'],
-    ];
+    const variants = ['CTA'];
+    if (el.classList.contains('area-two-four-desktop')) {
+      variants.push('Two Columns');
+    }
+    const cells = [];
 
     const title = el.querySelector('.push-area__title');
     if (title) {
@@ -215,10 +311,16 @@ const buildCards = (main, document) => {
       });
       cells.push([img, content]);
     });
-    const block = WebImporter.DOMUtils.createTable(cells, document);
-    block.dataset.blockName = 'cards';
+    const block = createBlock({
+      blockname: 'Cards',
+      variants,
+      cells,
+    }, document);
+    block.dataset.originalBlock = 'push-area';
     el.replaceWith(block);
   });
+
+  combineSubsequentBlocks(main, 'cards');
 };
 
 export default {
@@ -234,9 +336,12 @@ export default {
     metaBlock.dataset.blockName = 'metadata';
     main.prepend(metaBlock);
 
-    buildZPatterns(main, document);
     buildImageColumns(main, document);
     buildCards(main, document);
+    buildVideos(main, document);
+    buildAccordions(main, document);
+
+    convertBlocksToTables(main, document);
 
     results.push({
       element: main,
