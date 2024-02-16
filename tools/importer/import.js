@@ -8,6 +8,20 @@ const getMetadata = (name, document) => {
   return meta || '';
 };
 
+const rewritePath = (url) => {
+  let path = (new URL(url)).pathname;
+  path = path.replace(/\/$/, '').replace(/\.(s)?html$/, '');
+
+  const pathParts = path.split('/');
+  const name = pathParts.pop();
+  if (name.includes('.')) {
+    const nameParts = name.split('.');
+    path = `/${nameParts[1]}/${pathParts.join('/')}/${nameParts[0]}`;
+  }
+
+  return path;
+};
+
 const toClassName = (name) => {
   if (typeof name === 'string') {
     const clsName = name.toLowerCase()
@@ -345,7 +359,7 @@ export default {
 
     results.push({
       element: main,
-      path: new URL(params.originalURL).pathname,
+      path: rewritePath(params.originalURL),
     });
 
     return results;
