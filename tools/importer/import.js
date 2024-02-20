@@ -49,6 +49,9 @@ const convertBlocksToTables = (main, document) => {
     });
 
     const table = WebImporter.DOMUtils.createTable(cells, document);
+    table.dataset.originalBlock = block.dataset.originalBlock || '';
+    table.dataset.blockName = block.dataset.blockName || '';
+    table.dataset.variants = block.dataset.variants || '';
     block.replaceWith(table);
   });
 };
@@ -184,6 +187,7 @@ const combineSubsequentBlocks = (main, blockName) => {
         && (firstCols.dataset.cols === secondCols.dataset.cols)) {
         [...secondCols.children].forEach((row) => {
           firstCols.append(row);
+          firstCols.dataset.originalBlock += `, ${secondCols.dataset.originalBlock}`;
         });
         secondCols.remove();
       } else {
@@ -337,6 +341,50 @@ const buildCards = (main, document) => {
   combineSubsequentBlocks(main, 'cards');
 };
 
+const buildReport = (main) => {
+  const blockNames = new Set([...main.querySelectorAll('[data-block-name]')].map((block) => {
+    const { blockName, variants } = block.dataset;
+    return `${blockName}${variants ? ` (${variants})` : ''}`;
+  }));
+
+  const originalBlocks = new Set();
+  main.querySelectorAll('[data-original-block]').forEach((block) => {
+    block.dataset.originalBlock.split(',').forEach((blockName) => {
+      originalBlocks.add(blockName.trim());
+    });
+  });
+
+  const potentialBlocks = new Set();
+  const ignoredClasses = ['clearfix', 'box'];
+  [...main.children].forEach((child) => {
+    if (child.tagName === 'DIV') {
+      if (child.classList.contains('main_content')) {
+        [...child.children].forEach((gChild) => {
+          if (gChild.tagName === 'DIV') {
+            [...gChild.classList].forEach((cls) => {
+              if (!ignoredClasses.includes(cls)) {
+                potentialBlocks.add(cls);
+              }
+            });
+          }
+        });
+      } else {
+        [...child.classList].forEach((cls) => {
+          if (!ignoredClasses.includes(cls)) {
+            potentialBlocks.add(cls);
+          }
+        });
+      }
+    }
+  });
+
+  return {
+    blockNames,
+    originalBlocks,
+    potentialBlocks,
+  };
+};
+
 export default {
   transform: ({
     document, _url, _html, params,
@@ -357,9 +405,12 @@ export default {
 
     convertBlocksToTables(main, document);
 
+    const report = buildReport(main);
+
     results.push({
       element: main,
       path: rewritePath(params.originalURL),
+      report,
     });
 
     return results;
