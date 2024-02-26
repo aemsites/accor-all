@@ -80,7 +80,8 @@ function addMissingParagraphs(block) {
       const hasWrapper = !!blockColumn.firstElementChild
         && window.getComputedStyle(blockColumn.firstElementChild).display === 'block';
       if (!hasWrapper) {
-        blockColumn.append(p(blockColumn.childNodes));
+        const wrapper = p(blockColumn.childNodes);
+        blockColumn.append(wrapper);
       }
     }
   });
