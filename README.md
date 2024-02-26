@@ -1,9 +1,9 @@
-# Your Project's Title...
-Your project's description...
+# Accor All
+AEM Sites project for all.accor.com on Edge Delivery
 
 ## Environments
-- Preview: https://main--{repo}--{owner}.hlx.page/
-- Live: https://main--{repo}--{owner}.hlx.live/
+- Preview: https://main--accor-all--aemsites.hlx.page/
+- Live: https://main--accor-all--aemsites.hlx.live/
 
 ## Installation
 
