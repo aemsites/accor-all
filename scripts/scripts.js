@@ -15,7 +15,6 @@ import {
 } from './aem.js';
 import {
   checkDomain,
-  hasWrapper,
   linkTextIncludesHref,
   rewriteLinkUrl,
   wrapImgsInLinks,
@@ -70,19 +69,30 @@ function buildAutoBlocks(main, templateModule = undefined) {
 }
 
 /**
+  * Ensure all column div's within a block contain a block level element (p, h2, pre, etc.)
+  * Avoids situations where you end up with a column with just a text node but no wrapping p tag
+  * @param {Element} block the block element
+  */
+function addMissingParagraphs(block) {
+  block.querySelectorAll(':scope > div > div').forEach((blockColumn) => {
+    const hasContent = !!blockColumn.firstElementChild || !!block.textContent.trim();
+    if (hasContent) {
+      const hasWrapper = !!blockColumn.firstElementChild
+        && window.getComputedStyle(blockColumn.firstElementChild).display === 'block';
+      if (!hasWrapper) {
+        blockColumn.append(p(blockColumn.childNodes));
+      }
+    }
+  });
+}
+
+/**
  * add block level wrappers to all block content columns
  * @param {Element} main the main element
  */
 function addBlockWrappers(main) {
   main.querySelectorAll('.block').forEach((block) => {
-    block.querySelectorAll(':scope > div').forEach((row) => {
-      row.querySelectorAll(':scope > div').forEach((col) => {
-        if (!hasWrapper(col)) {
-          const wrapper = p(col.children);
-          col.append(wrapper);
-        }
-      });
-    });
+    addMissingParagraphs(block);
   });
 }
 

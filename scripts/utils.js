@@ -123,12 +123,3 @@ export function wrapImgsInLinks(container) {
 export function getOrigin() {
   return window.location.href === 'about:srcdoc' ? window.parent.location.origin : window.location.origin;
 }
-
-/**
- * Checks if an element has a block-level wrapper element inside of it (usually a <p> tag).
- * @param {Element} el the element to check
- * @returns {boolean} true or false
- */
-export function hasWrapper(el) {
-  return !!el.firstElementChild && window.getComputedStyle(el.firstElementChild).display === 'block';
-}
