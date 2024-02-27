@@ -12,10 +12,11 @@ export default async function decorate(block) {
   // load footer fragment
   const footerPath = footerMeta.footer || '/fragments/footer';
   const fragment = await loadFragment(footerPath);
+  if (fragment) {
+    // decorate footer DOM
+    const footer = document.createElement('div');
+    while (fragment.firstElementChild) footer.append(fragment.firstElementChild);
 
-  // decorate footer DOM
-  const footer = document.createElement('div');
-  while (fragment.firstElementChild) footer.append(fragment.firstElementChild);
-
-  block.append(footer);
+    block.append(footer);
+  }
 }

@@ -96,6 +96,8 @@ export default async function decorate(block) {
   const navPath = navMeta ? new URL(navMeta).pathname : '/fragments/nav';
   const fragment = await loadFragment(navPath);
 
+  if (!fragment) return;
+
   // decorate nav DOM
   const nav = document.createElement('nav');
   nav.id = 'nav';
