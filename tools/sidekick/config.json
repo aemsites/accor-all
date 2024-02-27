@@ -1,0 +1,36 @@
+{
+  "project": "Accor All",
+  "plugins": [
+    {
+      "id": "tools",
+      "title": "Tools",
+      "isContainer": true
+    },
+    {
+      "containerId": "tools",
+      "id": "library",
+      "title": "Library",
+      "environments": [
+        "edit"
+      ],
+      "url": "/tools/sidekick/library/library.html",
+      "includePaths": [
+        "**.docx**"
+      ]
+    },
+    {
+      "containerId": "tools",
+      "id": "asset-library",
+      "title": "AEM Assets",
+      "environments": [
+        "edit"
+      ],
+      "url": "https://experience.adobe.com/solutions/CQ-assets-selectors/static-assets/resources/franklin/asset-selector.html",
+      "isPalette": true,
+      "includePaths": [
+        "**.docx**"
+      ],
+      "paletteRect": "top: 50px; bottom: 10px; right: 10px; left: auto; width:400px; height: calc(100vh - 60px)"
+    }
+  ]
+}

@@ -15,10 +15,10 @@ import {
 } from './aem.js';
 import {
   checkDomain,
-  hasWrapper,
   linkTextIncludesHref,
   rewriteLinkUrl,
   wrapImgsInLinks,
+  wrapTextNodes,
 } from './utils.js';
 import {
   p,
@@ -73,16 +73,9 @@ function buildAutoBlocks(main, templateModule = undefined) {
  * add block level wrappers to all block content columns
  * @param {Element} main the main element
  */
-function addBlockWrappers(main) {
+function redecorateBlocks(main) {
   main.querySelectorAll('.block').forEach((block) => {
-    block.querySelectorAll(':scope > div').forEach((row) => {
-      row.querySelectorAll(':scope > div').forEach((col) => {
-        if (!hasWrapper(col)) {
-          const wrapper = p(col.children);
-          col.append(wrapper);
-        }
-      });
-    });
+    wrapTextNodes(block);
   });
 }
 
@@ -136,7 +129,7 @@ export function decorateMain(main, templateModule) {
   buildAutoBlocks(main, templateModule);
   decorateSections(main);
   decorateBlocks(main);
-  addBlockWrappers(main);
+  redecorateBlocks(main);
 }
 
 const validTemplates = [];
