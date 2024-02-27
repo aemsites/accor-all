@@ -18,6 +18,7 @@ import {
   linkTextIncludesHref,
   rewriteLinkUrl,
   wrapImgsInLinks,
+  wrapTextNodes,
 } from './utils.js';
 import {
   p,
@@ -69,28 +70,10 @@ function buildAutoBlocks(main, templateModule = undefined) {
 }
 
 /**
- * Wrap inline text content of block cells within a <p> tag.
- * @param {Element} block the block element
- */
-export function wrapTextNodes(block) {
-  block.querySelectorAll(':scope > div > div').forEach((blockColumn) => {
-    if (blockColumn.hasChildNodes()) {
-      const hasWrapper = !!blockColumn.querySelector('picture') /* exclude certain elements from being wrapped */
-        || (!!blockColumn.firstElementChild && window.getComputedStyle(blockColumn.firstElementChild).display === 'block');
-      if (!hasWrapper) {
-        const par = p();
-        while (blockColumn.firstChild) par.appendChild(blockColumn.firstChild);
-        blockColumn.append(par);
-      }
-    }
-  });
-}
-
-/**
  * add block level wrappers to all block content columns
  * @param {Element} main the main element
  */
-function addBlockWrappers(main) {
+function redecorateBlocks(main) {
   main.querySelectorAll('.block').forEach((block) => {
     wrapTextNodes(block);
   });
@@ -146,7 +129,7 @@ export function decorateMain(main, templateModule) {
   buildAutoBlocks(main, templateModule);
   decorateSections(main);
   decorateBlocks(main);
-  addBlockWrappers(main);
+  redecorateBlocks(main);
 }
 
 const validTemplates = [];
