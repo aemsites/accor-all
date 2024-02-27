@@ -69,19 +69,18 @@ function buildAutoBlocks(main, templateModule = undefined) {
 }
 
 /**
-  * Ensure all column div's within a block contain a block level element (p, h2, pre, etc.)
-  * Avoids situations where you end up with a column with just a text node but no wrapping p tag
-  * @param {Element} block the block element
-  */
-function addMissingParagraphs(block) {
+ * Wrap inline text content of block cells within a <p> tag.
+ * @param {Element} block the block element
+ */
+export function wrapTextNodes(block) {
   block.querySelectorAll(':scope > div > div').forEach((blockColumn) => {
-    const hasContent = !!blockColumn.firstElementChild || !!block.textContent.trim();
-    if (hasContent) {
-      const hasWrapper = !!blockColumn.firstElementChild
-        && window.getComputedStyle(blockColumn.firstElementChild).display === 'block';
+    if (blockColumn.hasChildNodes()) {
+      const hasWrapper = !!blockColumn.querySelector('picture') /* exclude certain elements from being wrapped */
+        || (!!blockColumn.firstElementChild && window.getComputedStyle(blockColumn.firstElementChild).display === 'block');
       if (!hasWrapper) {
-        const wrapper = p(blockColumn.childNodes);
-        blockColumn.append(wrapper);
+        const par = p();
+        while (blockColumn.firstChild) par.appendChild(blockColumn.firstChild);
+        blockColumn.append(par);
       }
     }
   });
@@ -93,7 +92,7 @@ function addMissingParagraphs(block) {
  */
 function addBlockWrappers(main) {
   main.querySelectorAll('.block').forEach((block) => {
-    addMissingParagraphs(block);
+    wrapTextNodes(block);
   });
 }
 
