@@ -3,7 +3,6 @@ import {
   buildBlock,
   loadHeader,
   loadFooter,
-  decorateIcons,
   decorateSections,
   decorateBlocks,
   decorateTemplateAndTheme,
@@ -21,7 +20,9 @@ import {
   wrapTextNodes,
 } from './utils.js';
 import {
+  domEl,
   p,
+  div,
 } from './dom-helpers.js';
 
 const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
@@ -117,6 +118,41 @@ function decorateLinks(main) {
 }
 
 /**
+ * Add <img> for icon, prefixed with codeBasePath and optional prefix.
+ * @param {Element} [span] span element with icon classes
+ * @param {string} [prefix] prefix to be added to icon src
+ * @param {string} [alt] alt text to be added to icon
+ */
+function decorateIcon(iconSpan, prefix = '', alt = '') {
+  const iconName = Array.from(iconSpan.classList)
+    .find((c) => c.startsWith('icon-'))
+    .substring(5);
+  const svg = domEl(
+    'svg',
+    { 'data-icon-name': iconName },
+  );
+  iconSpan.append(svg);
+  if (!window.hlx.icons) {
+    window.hlx.icons = new Set();
+  }
+  window.hlx.icons.add({ iconName, prefix, alt });
+}
+
+/**
+ * Add <img> for icons, prefixed with codeBasePath and optional prefix.
+ * @param {Element} [element] Element containing icons
+ * @param {string} [prefix] prefix to be added to icon the src
+ */
+function decorateIcons(element, prefix = '') {
+  const icons = [...element.querySelectorAll('span.icon')];
+  for (let i = 0; i < icons.length; i += 1) {
+    const iconSpan = icons[i];
+    // eslint-disable-next-line no-await-in-loop
+    decorateIcon(iconSpan, prefix);
+  }
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -197,6 +233,41 @@ function loadHeaderAndFooter(doc) {
   return Promise.all([headerLoaded, footerLoaded]);
 }
 
+async function downloadIcons(doc) {
+  const icons = window.hlx.icons || new Set();
+  // eslint-disable-next-line no-restricted-syntax
+  for (const icon of icons) {
+    // eslint-disable-next-line no-await-in-loop
+    const resp = await fetch(`${window.hlx.codeBasePath}${icon.prefix}/icons/${icon.iconName}.svg`);
+    if (resp.ok) {
+      // eslint-disable-next-line no-await-in-loop
+      const svgMarkup = await resp.text();
+      if (svgMarkup.match(/(<style | class=)/)) {
+        let { alt } = icon;
+        if (!alt) {
+          const dp = new DOMParser();
+          const svgDoc = dp.parseFromString(svgMarkup, 'image/svg+xml');
+          const title = svgDoc.querySelector('title');
+          if (title) {
+            alt = title.textContent;
+          }
+        }
+        const iconImg = domEl('img', { src: `${window.hlx.codeBasePath}${icon.prefix}/icons/${icon.iconName}.svg`, alt });
+        doc.querySelectorAll(`svg[data-icon-name="${icon.iconName}"]`).forEach((svg) => {
+          svg.replaceWith(iconImg.cloneNode(true));
+        });
+      } else {
+        const temp = div();
+        temp.innerHTML = svgMarkup.replace(/ width=".*?"/, '').replace(/ height=".*?"/, '').replace(/ id=".*?"/, '');
+        const iconSvg = temp.querySelector('svg');
+        doc.querySelectorAll(`svg[data-icon-name="${icon.iconName}"]`).forEach((svg) => {
+          svg.replaceWith(iconSvg.cloneNode(true));
+        });
+      }
+    }
+  }
+}
+
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
@@ -218,6 +289,7 @@ async function loadLazy(doc) {
   lazyPromises.push(loadFonts());
 
   await Promise.all(lazyPromises);
+  await downloadIcons(doc); // this needs to happen only after header/footer are fully loaded
 
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));

@@ -15,7 +15,7 @@
   box-sizing: border-box;
 }
 
-img, picture, video, canvas, svg {
+img, picture, video, canvas {
   display: block;
   max-width: 100%;
 }
@@ -187,12 +187,14 @@ main img {
 }
 
 .icon {
+  --icon-size: 24px;
+
   display: inline-block;
-  height: 24px;
-  width: 24px;
+  height: var(--icon-size);
+  width: var(--icon-size);
 }
 
-.icon img {
+.icon svg {
   height: 100%;
   width: 100%;
 }
