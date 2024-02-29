@@ -1,3 +1,5 @@
+import { toCamelCase } from './aem.js';
+
 export const PRODUCTION_DOMAINS = ['all.accor.com'];
 
 const domainCheckCache = {};
@@ -140,4 +142,35 @@ export function wrapTextNodes(block) {
       }
     }
   });
+}
+
+export function getConfig(segment = '') {
+  window.hlx.config = window.hlx.config || {};
+  if (!window.hlx.config[segment]) {
+    window.placeholders[segment] = new Promise((resolve) => {
+      fetch(`/config.json${segment ? `?sheet=${segment}` : ''}`)
+        .then((resp) => {
+          if (resp.ok) {
+            return resp.json();
+          }
+          return {};
+        })
+        .then((json) => {
+          const configs = {};
+          json.data
+            .filter((placeholder) => placeholder.Key)
+            .forEach((placeholder) => {
+              configs[toCamelCase(placeholder.Key)] = placeholder.Text;
+            });
+          window.hlx.config[segment] = configs;
+          resolve(window.hlx.config[segment]);
+        })
+        .catch(() => {
+          // error loading placeholders
+          window.hlx.config[segment] = {};
+          resolve(window.hlx.config[segment]);
+        });
+    });
+  }
+  return window.hlx.config[segment];
 }
