@@ -20,6 +20,17 @@
     },
     {
       "containerId": "tools",
+      "id": "preflight",
+      "title": "Preflight",
+      "environments": [
+        "dev",
+        "preview",
+        "live"
+      ],
+      "event": "preflight"
+    },
+    {
+      "containerId": "tools",
       "id": "asset-library",
       "title": "AEM Assets",
       "environments": [
