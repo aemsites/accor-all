@@ -23,10 +23,6 @@ dialog#preflight picture.bg-img img {
   position: relative;
 }
 
-dialog#preflight .modal-content .preflight {
-  padding: 2rem;
-}
-
 .preflight-tab-panel {
   display: grid;
   grid-template-rows: 1fr;
