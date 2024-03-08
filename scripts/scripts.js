@@ -241,6 +241,9 @@ function helixSideKickObserver() {
     const { default: createModal } = await import('../blocks/modal/modal.js');
     const modal = await createModal(wrapper.childNodes);
     modal.dialog.id = 'preflight';
+    modal.dialog.addEventListener('close', () => {
+      modal.block.remove();
+    });
     modal.showModal();
   };
 
