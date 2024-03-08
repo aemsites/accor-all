@@ -1,15 +1,14 @@
 // eslint-disable-next-line import/no-cycle
 import { loadFragment } from '../fragment/fragment.js';
 import {
-  buildBlock, decorateBlock, decorateIcons, loadBlock, loadCSS,
+  buildBlock, decorateBlock, decorateIcons, loadBlock,
 } from '../../scripts/aem.js';
 
 // This is not a traditional block, so there is no decorate function. Instead, links to
 // a */modals/* path  are automatically transformed into a modal. Other blocks can also use
 // the createModal() and openModal() functions.
 
-export default async function createModal(contentNodes) {
-  await loadCSS(`${window.hlx.codeBasePath}/blocks/modal/modal.css`);
+export async function createModal(contentNodes) {
   const dialog = document.createElement('dialog');
   const dialogContent = document.createElement('div');
   dialogContent.classList.add('modal-content');
@@ -22,6 +21,7 @@ export default async function createModal(contentNodes) {
   closeButton.type = 'button';
   closeButton.innerHTML = '<span class="icon icon-close"></span>';
   closeButton.addEventListener('click', () => dialog.close());
+  decorateIcons(closeButton);
   dialog.append(closeButton);
 
   // close dialog on clicks outside the dialog. https://stackoverflow.com/a/70593278/79461
@@ -37,7 +37,7 @@ export default async function createModal(contentNodes) {
   document.querySelector('main').append(block);
   decorateBlock(block);
   await loadBlock(block);
-  decorateIcons(closeButton);
+  block.innerHTML = '';
 
   dialog.addEventListener('close', () => {
     document.body.classList.remove('modal-open');
@@ -45,6 +45,7 @@ export default async function createModal(contentNodes) {
   });
 
   block.append(dialog);
+
   return {
     block,
     dialog,

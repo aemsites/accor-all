@@ -238,7 +238,7 @@ function helixSideKickObserver() {
     decorateBlock(preflightBlock);
     await loadBlock(preflightBlock);
     // eslint-disable-next-line import/no-cycle
-    const { default: createModal } = await import('../blocks/modal/modal.js');
+    const { createModal } = await import('../blocks/modal/modal.js');
     const modal = await createModal(wrapper.childNodes);
     modal.dialog.id = 'preflight';
     modal.dialog.addEventListener('close', () => {
