@@ -23,11 +23,6 @@ dialog#preflight picture.bg-img img {
   position: relative;
 }
 
-.preflight-tab-panel {
-  display: grid;
-  grid-template-rows: 1fr;
-}
-
 .preflight-heading {
   display: flex;
   align-items: end;
@@ -257,17 +252,11 @@ span.preflight-time {
 
 
 /* SEO */
-.seo-columns {
+.seo-panel-content {
   margin: 24px 48px;
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 0 48px;
-}
-
-@media (width >= 900px) {
-  .seo-columns {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 
 .seo-item {
@@ -275,6 +264,7 @@ span.preflight-time {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 12px;
+  flex: 1 1 275px;
 }
 
 .result-icon {

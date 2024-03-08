@@ -159,16 +159,12 @@ export default function Panel() {
   useEffect(() => { getResults(); }, []);
 
   return html`
-      <div class=seo-columns>
-      <div class=seo-column>
+      <div class=seo-panel-content>
         <${SeoItem} icon=${h1Result.value.icon} title=${h1Result.value.title} description=${h1Result.value.description} />
         <${SeoItem} icon=${titleResult.value.icon} title=${titleResult.value.title} description=${titleResult.value.description} />       
         <${SeoItem} icon=${descResult.value.icon} title=${descResult.value.title} description=${descResult.value.description} />
-      </div>
-      <div class=seo-column>
         <${SeoItem} icon=${bodyResult.value.icon} title=${bodyResult.value.title} description=${bodyResult.value.description} />
         <${SeoItem} icon=${linksResult.value.icon} title=${linksResult.value.title} description=${linksResult.value.description} />
         <${SeoItem} icon=${canonResult.value.icon} title=${canonResult.value.title} description=${canonResult.value.description} />
-      </div>
     </div>`;
 }
