@@ -12,6 +12,8 @@ import {
   loadCSS,
   getMetadata,
   toClassName,
+  decorateBlock,
+  loadBlock,
 } from './aem.js';
 import {
   checkDomain,
@@ -22,6 +24,7 @@ import {
 } from './utils.js';
 import {
   p,
+  div,
 } from './dom-helpers.js';
 
 const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
@@ -225,10 +228,41 @@ async function loadLazy(doc) {
 }
 
 /**
+ * observe sidekick element for events
+ */
+function helixSideKickObserver() {
+  const preflightListener = async () => {
+    const wrapper = div();
+    const preflightBlock = buildBlock('preflight', '');
+    wrapper.appendChild(preflightBlock);
+    decorateBlock(preflightBlock);
+    await loadBlock(preflightBlock);
+    // eslint-disable-next-line import/no-cycle
+    const { default: createModal } = await import('../blocks/modal/modal.js');
+    const modal = await createModal(wrapper.childNodes);
+    modal.dialog.id = 'preflight';
+    modal.showModal();
+  };
+
+  let sk = document.querySelector('helix-sidekick');
+  if (sk) {
+    // sidekick already loaded
+    sk.addEventListener('custom:preflight', preflightListener);
+  } else {
+    // wait for sidekick to be loaded
+    document.addEventListener('sidekick-ready', () => {
+      sk = document.querySelector('helix-sidekick');
+      sk.addEventListener('custom:preflight', preflightListener);
+    }, { once: true });
+  }
+}
+
+/**
  * Loads everything that happens a lot later,
  * without impacting the user experience.
  */
 function loadDelayed() {
+  helixSideKickObserver();
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
   // load anything that can be postponed to the latest here
