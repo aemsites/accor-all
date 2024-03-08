@@ -26,13 +26,15 @@ img, picture, video, canvas, svg {
   /* colors */
   --clr-white: #fff;
   --clr-black: #000;
+  --clr-blue-700: #050033;
   --clr-blue-500: #252339;
   --clr-blue-400: #1e1852;
   --clr-blue-300: #1264a3;
   --clr-neutral-500: #3e3d48;
   --clr-neutral-400: #dadadd;
   --clr-neutral-300: #ecedf4;
-  
+  --clr-neutral-200: #f4f4f5;
+
 
   /* element colors */
   --clr-bg: var(--clr-white);
@@ -144,7 +146,7 @@ a.button:any-link, button.button {
   padding: 5px 30px;
   text-align: center;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
   color: var(--clr-bg);
   background-color: var(--clr-link);
@@ -208,7 +210,9 @@ main .section {
 
 @media (width >= 900px) {
   main .section {
-    padding-inline: 4rem;
+    max-width: var(--content-max-width);
+    padding: 4rem;
+    margin: auto;
   }
 }
 

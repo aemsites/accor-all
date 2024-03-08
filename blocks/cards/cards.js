@@ -9,6 +9,12 @@ export default function decorate(block) {
     [...li.children].forEach((div) => {
       if (div.children.length === 1 && div.querySelector('picture')) div.className = 'cards-card-image';
       else div.className = 'cards-card-body';
+      const anchor = div.querySelector('a');
+      if (!block.classList.contains('cta') && anchor != null) {
+        // remove button
+        anchor.classList.remove('button');
+        anchor.parentNode.classList.remove('button-container');
+      }
     });
     ul.append(li);
   });
