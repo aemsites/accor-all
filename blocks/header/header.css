@@ -1,6 +1,6 @@
 /* header and nav layout */
 header .nav-wrapper {
-  background-color: var(--background-color);
+  background-color: var(--clr-bg);
   width: 100%;
   z-index: 2;
   position: fixed;
@@ -71,7 +71,7 @@ header nav .nav-hamburger button {
   border: 0;
   border-radius: 0;
   padding: 0;
-  background-color: var(--background-color);
+  background-color: var(--clr-bg);
   color: inherit;
   overflow: initial;
   text-overflow: initial;
@@ -158,7 +158,7 @@ header nav .nav-sections {
   flex: 1 1 auto;
   display: none;
   visibility: hidden;
-  background-color: var(--overlay-color);
+  background-color: var(--clr-neutral-500);
 }
 
 header nav[aria-expanded="true"] .nav-sections {
@@ -248,7 +248,7 @@ header nav .nav-sections ul > li > ul > li {
     width: 200px;
     margin-top: 12px;
     padding: 1em;
-    background-color: var(--light-color);
+    background-color: var(--clr-neutral-400);
     white-space: initial;
   }
 
@@ -261,7 +261,7 @@ header nav .nav-sections ul > li > ul > li {
     height: 0;
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
-    border-bottom: 8px solid var(--light-color);
+    border-bottom: 8px solid var(--clr-neutral-400);
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li > ul > li {
