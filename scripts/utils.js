@@ -144,11 +144,11 @@ export function wrapTextNodes(block) {
   });
 }
 
-export function getConfig(segment = '') {
+export function getConfig(prefix = '', segment = '') {
   window.hlx.config = window.hlx.config || {};
   if (!window.hlx.config[segment]) {
-    window.placeholders[segment] = new Promise((resolve) => {
-      fetch(`/config.json${segment ? `?sheet=${segment}` : ''}`)
+    window.hlx.config[segment] = new Promise((resolve) => {
+      fetch(`${prefix}/config.json${segment ? `?sheet=${segment}` : ''}`)
         .then((resp) => {
           if (resp.ok) {
             return resp.json();
@@ -158,15 +158,15 @@ export function getConfig(segment = '') {
         .then((json) => {
           const configs = {};
           json.data
-            .filter((placeholder) => placeholder.Key)
-            .forEach((placeholder) => {
-              configs[toCamelCase(placeholder.Key)] = placeholder.Text;
+            .filter((cfg) => cfg.Key)
+            .forEach((cfg) => {
+              configs[toCamelCase(cfg.Key)] = cfg.Value;
             });
           window.hlx.config[segment] = configs;
           resolve(window.hlx.config[segment]);
         })
         .catch(() => {
-          // error loading placeholders
+          // error loading config
           window.hlx.config[segment] = {};
           resolve(window.hlx.config[segment]);
         });
