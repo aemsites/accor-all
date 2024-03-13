@@ -93,10 +93,15 @@ header .header .ace-navbar-toggler .ace-burger-menu__letters {
 
 .ace-header-navigation__loginconnect[data-loaded="false"] {
   width: 40px;
+  height: 40px;
+  background-color: #1e1852;
+  border-radius: 50%;
 }
 
 @media (width >= 900px) {
   .ace-header-navigation__loginconnect[data-loaded="false"] {
     width: 240px;
+    height: 48px;
+    border-radius: 3.125rem;
   }
 }
