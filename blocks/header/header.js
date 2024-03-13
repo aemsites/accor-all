@@ -54,8 +54,9 @@ export default async function decorate(block) {
     login.dataset.loaded = 'false';
     window.hlx.delayed.push(() => {
       loadScript('https://all.accor.com/a/etc.clientlibs/ace/clientlibs/clienlibs-3rd-parties/clientlib-vue.lc-f35b543fbf132ab69f5c12eebf271456-lc.min.js').then(() => {
-        loadScript('https://all.accor.com/a/etc.clientlibs/ace/clientlibs-modules/components/clientlib-login-connect.lc-b27595ed7b70c37aa84425e0ee358211-lc.min.js');
-        login.dataset.loaded = null;
+        loadScript('https://all.accor.com/a/etc.clientlibs/ace/clientlibs-modules/components/clientlib-login-connect.lc-b27595ed7b70c37aa84425e0ee358211-lc.min.js').then(() => {
+          login.dataset.loaded = null;
+        });
       });
     });
   }
