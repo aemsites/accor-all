@@ -49,7 +49,13 @@ export default async function decorate(block) {
   navEl.append(...headerDoc.querySelector('.ace-header-navigation').children);
   block.replaceChildren(navWrapper);
 
-  // load vue and login module
-  await loadScript('https://all.accor.com/a/etc.clientlibs/ace/clientlibs/clienlibs-3rd-parties/clientlib-vue.lc-f35b543fbf132ab69f5c12eebf271456-lc.min.js');
-  await loadScript('https://all.accor.com/a/etc.clientlibs/ace/clientlibs-modules/components/clientlib-login-connect.lc-b27595ed7b70c37aa84425e0ee358211-lc.min.js');
+  const login = block.querySelector('.ace-header-navigation__loginconnect');
+  if (login) {
+    login.dataset.loaded = 'false';
+    setTimeout(async () => {
+      await loadScript('https://all.accor.com/a/etc.clientlibs/ace/clientlibs/clienlibs-3rd-parties/clientlib-vue.lc-f35b543fbf132ab69f5c12eebf271456-lc.min.js');
+      await loadScript('https://all.accor.com/a/etc.clientlibs/ace/clientlibs-modules/components/clientlib-login-connect.lc-b27595ed7b70c37aa84425e0ee358211-lc.min.js');
+      login.dataset.loaded = null;
+    }, 4000);
+  }
 }

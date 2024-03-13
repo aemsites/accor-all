@@ -90,3 +90,13 @@ header .header .ace-navbar-toggler .ace-burger-menu__letters {
   font-weight: 500;
   line-height: 1rem;
 }
+
+.ace-header-navigation__loginconnect[data-loaded="false"] {
+  width: 40px;
+}
+
+@media (width >= 900px) {
+  .ace-header-navigation__loginconnect[data-loaded="false"] {
+    width: 240px;
+  }
+}
