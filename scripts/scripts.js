@@ -28,6 +28,7 @@ import {
 } from './dom-helpers.js';
 
 const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
+window.hlx.delayed = [];
 
 /**
  * Builds fragment blocks from links to fragments
@@ -267,7 +268,10 @@ function helixSideKickObserver() {
 function loadDelayed() {
   helixSideKickObserver();
   // eslint-disable-next-line import/no-cycle
-  window.setTimeout(() => import('./delayed.js'), 3000);
+  window.setTimeout(() => {
+    window.hlx.delayed.forEach((fn) => fn());
+    import('./delayed.js');
+  }, 3000);
   // load anything that can be postponed to the latest here
 }
 
