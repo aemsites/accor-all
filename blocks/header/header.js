@@ -1,17 +1,26 @@
 import { loadScript } from '../../scripts/aem.js';
 import { div } from '../../scripts/dom-helpers.js';
 
-/**
- * decorates the header, mainly the nav
- * @param {Element} block The header block element
- */
-export default async function decorate(block) {
-  // TODO assign from metadata?
-  const lang = 'en';
-  const market = 'en_usa';
+async function fetchHeaderContent() {
+  let html = '';
+  try {
+    // TODO assign from metadata?
+    const lang = 'en';
+    const market = 'en_usa';
 
-  const resp = await fetch(`https://all.accor.com/a/content/experience-fragments/all/header/navigation/${lang}/${market}/jcr:content.content.nocache.html`);
-  const html = await resp.text();
+    const resp = await fetch(`https://all.accor.com/a/content/experience-fragments/all/header/navigation/${lang}/${market}/jcr:content.content.nocache.html`);
+    html = await resp.text();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to fetch nav html (likely due to CORS). Falling back to local.', e);
+  }
+  if (!html) {
+    const resp = await fetch(`${window.hlx.codeBasePath}/blocks/header/header-fallback.html`);
+    if (resp.ok) {
+      html = await resp.text();
+    }
+  }
+
   const dp = new DOMParser();
   const doc = dp.parseFromString(html, 'text/html');
   const refEls = [{ tag: 'img', attr: 'src' }, { tag: 'a', attr: 'href' }, { tag: 'source', attr: 'srcset' }];
@@ -24,11 +33,20 @@ export default async function decorate(block) {
   });
 
   doc.querySelectorAll('script').forEach((s) => s.remove());
+  return doc;
+}
+
+/**
+ * decorates the header, mainly the nav
+ * @param {Element} block The header block element
+ */
+export default async function decorate(block) {
+  const headerDoc = await fetchHeaderContent();
   const navWrapper = div({ class: 'nav-wrapper' });
   navWrapper.className = 'nav-wrapper';
   const navEl = div({ class: 'header-navigation' });
   navWrapper.append(navEl);
-  navEl.append(...doc.querySelector('.ace-header-navigation').children);
+  navEl.append(...headerDoc.querySelector('.ace-header-navigation').children);
   block.replaceChildren(navWrapper);
 
   // load vue and login module
