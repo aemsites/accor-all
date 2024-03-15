@@ -57,6 +57,7 @@ img, picture, video, canvas, svg {
   --heading-font-size-400: 22px;
   --heading-font-size-300: 20px;
   --heading-font-size-200: 18px;
+  --heading-font-size-100: 16px;
 
   /* nav height */
   --nav-height: 64px;

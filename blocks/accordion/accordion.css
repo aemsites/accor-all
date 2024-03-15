@@ -1,0 +1,87 @@
+.accordion details{
+    border-top: 1px solid var(--clr-neutral-400);
+    border-bottom: 1px solid var(--clr-neutral-400);
+    margin-top: -1px;
+    padding: 15px 0;
+}
+
+.accordion details summary p,
+.accordion details summary :is(h1,h2,h3,h4,h5,h6) {
+    margin: 0;
+    font-size: var(--heading-font-size-100);
+    font-weight: 400;
+    line-height: 25px;
+}
+
+.accordion details summary {
+    position: relative;
+    padding: 0 48px 0 16px;
+    cursor: pointer;
+    list-style: none;
+    transition: background-color 0.2s;
+    overflow-y: hidden;
+    color: var(--clr-blue-300);
+}
+
+.accordion details[open] summary {
+    color: var(--clr-blue-400);
+}
+
+.accordion details summary:hover {
+    color: var(--clr-blue-400);
+}
+
+.accordion details summary::-webkit-details-marker {
+    display: none;
+}
+
+.accordion details summary::after {
+    content: "";
+    position: absolute;
+    top: 45%;
+    right: 18px;
+    transform: translateY(-50%) rotate(135deg);
+    width: 11px;
+    height: 11px;
+    font-weight: 400;
+    border: 2px solid var(--clr-blue-300);
+    border-width: 2px 2px 0 0;
+    transition: transform 0.2s;
+}
+
+.accordion details[open] summary::after {
+    border-color: var(--clr-blue-400);
+    transform: translateY(-50%) rotate(-45deg);
+    top: 60%;
+}
+
+.accordion details .accordion-item-body {
+    padding: 10px 16px;
+    line-height: 24px;
+}
+
+.accordion details .accordion-item-body :is(h1,h2,h3,h4,h5,h6){
+    margin: 48px 0 24px;
+    line-height: 32px;
+    font-size: var(--heading-font-size-200);
+}
+
+.accordion details .accordion-item-body a {
+    text-decoration: underline;
+    color: var(--clr-blue-300)
+}
+
+.accordion details .accordion-item-body ul {
+    list-style: inside;
+    padding-left: 0;
+}
+
+.accordion details .accordion-item-body ul ul{
+    padding: 15px 0 0 40px;
+}
+
+@media (width >= 900px) {
+    .accordion details .accordion-item-body :is(h1,h2,h3,h4,h5,h6) {
+        font-size: var(--heading-font-size-300);
+    }
+}
