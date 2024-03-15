@@ -85,13 +85,13 @@
     }
 
     .cards > ul > li {
-        width: calc(100% / 3 - 12px);
+        width: calc((100% / 3) - 12px);
         margin-bottom: 32px;
     }
 
     .cards.two-columns > ul > li,
     .cards.cta > ul > li {
-        width: calc(100% / 2 - 12px);
+        width: calc((100% / 2) - 12px);
     }
 
     .cards.cta > ul > li:nth-last-child(1):nth-child(odd) {
