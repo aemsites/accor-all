@@ -30,7 +30,8 @@ img, picture, video, canvas, svg {
   --clr-blue-500: #252339;
   --clr-blue-400: #1e1852;
   --clr-blue-300: #1264a3;
-  --clr-neutral-500: #3e3d48;
+  --clr-neutral-700: #3e3d48;
+  --clr-neutral-500: #6f6e77;
   --clr-neutral-400: #dadadd;
   --clr-neutral-300: #ecedf4;
   --clr-neutral-200: #f4f4f5;
@@ -47,6 +48,7 @@ img, picture, video, canvas, svg {
   --heading-font-family: montserrat, montserrat-fallback;
 
   /* body sizes */
+  --body-font-size-700: 24px;
   --body-font-size-500: 20px;
   --body-font-size-400: 16px;
   --body-font-size-300: 12px;
@@ -159,7 +161,6 @@ a.button:any-link, button.button {
 }
 
 a.button:hover, a.button:focus, button.button:hover, button.button:focus  {
-  background-color: var(--clr-link-hover);
   cursor: pointer;
 }
 
@@ -200,6 +201,10 @@ main .section {
 .section > div {
   max-width: var(--content-max-width);
   margin-inline: auto;
+}
+
+main .section div[data-align="justify"] p{
+  text-align: justify;
 }
 
 @media (width >= 600px) {
