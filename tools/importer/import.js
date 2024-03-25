@@ -165,10 +165,22 @@ const createMetadata = (document) => {
   return meta;
 };
 
+const buttonLineBreak = (content, classIdentifier, document) => {
+  const buttonEl = content.querySelectorAll(classIdentifier);
+  if (buttonEl !== null) {
+    const newParagraph = document.createElement('p');
+    const anchorEl = buttonEl[0].parentNode;
+    content.insertBefore(newParagraph, anchorEl);
+    newParagraph.appendChild(anchorEl);
+  }
+};
+
 const buildColumnRow = (row, cells, document, reverse = false) => {
   const left = row.classList.contains('one-bloc-left-pics');
   const img = left ? row.querySelector('.one-bloc-left-pics__img-wrap') : row.querySelector('.one-bloc-right-pics__img-wrap');
   const content = left ? row.querySelector('.one-bloc-left-pics__right-desc') : row.querySelector('.one-bloc-right-pics__left-desc');
+  // forcing linebreak in case of button
+  buttonLineBreak(content, '[class*="highlight-button-label"]', document);
   content.querySelectorAll('.one-bloc-left-pics__highlight-title, .one-bloc-right-pics__highlight-title').forEach((title) => {
     const titleEl = document.createElement('h2');
     titleEl.textContent = title.textContent;
@@ -327,6 +339,7 @@ const buildCards = (main, document) => {
         h3.textContent = cardTitle.textContent;
         cardTitle.replaceWith(h3);
       });
+      buttonLineBreak(content, '.push-card__button-label', document);
       cells.push([img, content]);
     });
     const block = createBlock({
