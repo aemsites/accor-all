@@ -152,7 +152,6 @@ a.button:any-link, button.button {
   color: var(--clr-bg);
   background-color: var(--clr-link);
   margin: 1rem 0;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   border-radius: 30px;

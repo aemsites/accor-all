@@ -1,6 +1,15 @@
 import { loadScript } from '../../scripts/aem.js';
 import { div } from '../../scripts/dom-helpers.js';
 
+// media query match that indicates mobile/tablet width
+const isDesktop = window.matchMedia('(min-width: 900px)');
+
+function toggleMenu(navEl, navToggler, forceExpanded = null) {
+  const expanded = forceExpanded !== null ? !forceExpanded : navToggler.getAttribute('aria-expanded') === 'true';
+  navToggler.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  document.body.style.overflowY = (expanded || isDesktop.matches) ? '' : 'hidden';
+}
+
 async function fetchHeaderContent() {
   let html = '';
   try {
@@ -42,12 +51,18 @@ async function fetchHeaderContent() {
  */
 export default async function decorate(block) {
   const headerDoc = await fetchHeaderContent();
-  const navWrapper = div({ class: 'nav-wrapper' });
-  navWrapper.className = 'nav-wrapper';
-  const navEl = div({ class: 'header-navigation' });
-  navWrapper.append(navEl);
-  navEl.append(...headerDoc.querySelector('.ace-header-navigation').children);
-  block.replaceChildren(navWrapper);
+  const headerWrapper = div({ class: 'header-wrapper' });
+  const headerNav = div({ class: 'header-navigation' });
+  headerWrapper.append(headerNav);
+  headerNav.append(...headerDoc.querySelector('.ace-header-navigation').children);
+  block.replaceChildren(headerWrapper);
+
+  const navToggler = block.querySelector('.ace-navbar-toggler');
+  const navEl = block.querySelector(`#${navToggler.getAttribute('aria-controls')}`);
+  navToggler.addEventListener('click', () => toggleMenu(navEl, navToggler));
+  // prevent mobile nav behavior on window resize
+  toggleMenu(navEl, navToggler, isDesktop.matches);
+  isDesktop.addEventListener('change', () => toggleMenu(navEl, navToggler, isDesktop.matches));
 
   const login = block.querySelector('.ace-header-navigation__loginconnect');
   if (login) {
