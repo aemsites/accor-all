@@ -8,18 +8,22 @@ const getMetadata = (name, document) => {
   return meta || '';
 };
 
-const rewritePath = (url) => {
-  let path = (new URL(url)).pathname;
-  path = path.replace(/\/$/, '').replace(/\.(s)?html$/, '');
+const rewritePath = (path) => {
+  let finalPath = path.replace(/\/$/, '').replace(/\.(s)?html$/, '');
 
   const pathParts = path.split('/');
   const name = pathParts.pop();
   if (name.includes('.')) {
     const nameParts = name.split('.');
-    path = `/${nameParts[1]}/${pathParts.join('/')}/${nameParts[0]}`;
+    finalPath = `/${nameParts[1]}${pathParts.join('/')}/${nameParts[0]}`;
   }
 
-  return path;
+  return finalPath;
+};
+
+const rewriteURL = (url) => {
+  const path = (new URL(url)).pathname;
+  return rewritePath(path);
 };
 
 const toClassName = (name) => {
@@ -167,7 +171,7 @@ const createMetadata = (document) => {
 
 const buttonLineBreak = (content, classIdentifier, document) => {
   const buttonEl = content.querySelectorAll(classIdentifier);
-  if (buttonEl !== null) {
+  if (buttonEl !== null && buttonEl.length > 0) {
     const newParagraph = document.createElement('p');
     const anchorEl = buttonEl[0].parentNode;
     content.insertBefore(newParagraph, anchorEl);
@@ -422,7 +426,7 @@ export default {
 
     results.push({
       element: main,
-      path: rewritePath(params.originalURL),
+      path: rewriteURL(params.originalURL),
       report,
     });
 
@@ -436,6 +440,12 @@ export default {
       }
 
       img.setAttribute('loading', 'eager');
+    });
+    document.querySelectorAll('a').forEach((link) => {
+      const href = link.getAttribute('href');
+      if (href !== null && href.indexOf('shtml') > -1 && href.startsWith('/')) {
+        link.setAttribute('href', rewritePath(href));
+      }
     });
   },
 };
