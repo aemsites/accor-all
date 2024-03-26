@@ -8,18 +8,22 @@ const getMetadata = (name, document) => {
   return meta || '';
 };
 
-const rewritePath = (url) => {
-  let path = (new URL(url)).pathname;
-  path = path.replace(/\/$/, '').replace(/\.(s)?html$/, '');
+const rewritePath = (path) => {
+  let finalPath = path.replace(/\/$/, '').replace(/\.(s)?html$/, '');
 
   const pathParts = path.split('/');
   const name = pathParts.pop();
   if (name.includes('.')) {
     const nameParts = name.split('.');
-    path = `/${nameParts[1]}/${pathParts.join('/')}/${nameParts[0]}`;
+    finalPath = `/${nameParts[1]}${pathParts.join('/')}/${nameParts[0]}`;
   }
 
-  return path;
+  return finalPath;
+};
+
+const rewriteURL = (url) => {
+  const path = (new URL(url)).pathname;
+  return rewritePath(path);
 };
 
 const toClassName = (name) => {
@@ -165,10 +169,22 @@ const createMetadata = (document) => {
   return meta;
 };
 
+const buttonLineBreak = (content, classIdentifier, document) => {
+  const buttonEl = content.querySelectorAll(classIdentifier);
+  if (buttonEl !== null && buttonEl.length > 0) {
+    const newParagraph = document.createElement('p');
+    const anchorEl = buttonEl[0].parentNode;
+    content.insertBefore(newParagraph, anchorEl);
+    newParagraph.appendChild(anchorEl);
+  }
+};
+
 const buildColumnRow = (row, cells, document, reverse = false) => {
   const left = row.classList.contains('one-bloc-left-pics');
   const img = left ? row.querySelector('.one-bloc-left-pics__img-wrap') : row.querySelector('.one-bloc-right-pics__img-wrap');
   const content = left ? row.querySelector('.one-bloc-left-pics__right-desc') : row.querySelector('.one-bloc-right-pics__left-desc');
+  // forcing linebreak in case of button
+  buttonLineBreak(content, '[class*="highlight-button-label"]', document);
   content.querySelectorAll('.one-bloc-left-pics__highlight-title, .one-bloc-right-pics__highlight-title').forEach((title) => {
     const titleEl = document.createElement('h2');
     titleEl.textContent = title.textContent;
@@ -327,6 +343,7 @@ const buildCards = (main, document) => {
         h3.textContent = cardTitle.textContent;
         cardTitle.replaceWith(h3);
       });
+      buttonLineBreak(content, '.push-card__button-label', document);
       cells.push([img, content]);
     });
     const block = createBlock({
@@ -409,7 +426,7 @@ export default {
 
     results.push({
       element: main,
-      path: rewritePath(params.originalURL),
+      path: rewriteURL(params.originalURL),
       report,
     });
 
@@ -423,6 +440,12 @@ export default {
       }
 
       img.setAttribute('loading', 'eager');
+    });
+    document.querySelectorAll('a').forEach((link) => {
+      const href = link.getAttribute('href');
+      if (href !== null && href.indexOf('shtml') > -1 && href.startsWith('/')) {
+        link.setAttribute('href', rewritePath(href));
+      }
     });
   },
 };

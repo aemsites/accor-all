@@ -13,7 +13,9 @@
 }
 
 .cards.cta > ul > li {
-    background-color: var(--clr-neutral-200)
+    background-color: var(--clr-neutral-200);
+    display: flex;
+    flex-direction: column;
 }
 
 
@@ -25,6 +27,21 @@
     line-height: 36px;
 }
 
+.cards .cards-card-body a {
+    color: var(--clr-blue-300);
+}
+
+.cards .cards-card-body h2 a,
+.cards .cards-card-body h3 a {
+    font-size: 24px;
+    text-decoration: underline;
+    line-height: 30px;
+}
+
+.cards .cards-card-body h1 a {
+    text-decoration: underline;
+}
+
 .cards .cards-card-body {
     padding: 16px;
 }
@@ -32,6 +49,10 @@
 .cards.cta .cards-card-body {
     text-align: center;
     padding: 32px;
+    display: flex;
+    flex-flow: column wrap;
+    height: 100%;
+    justify-content: space-between;
 }
 
 .cards.cta .cards-card-body p {
@@ -40,10 +61,6 @@
 
 .cards .cards-card-body p:last-child {
     margin-bottom: 0;
-}
-
-.cards .cards-card-body a {
-    color: var(--clr-blue-300);
 }
 
 .cards.cta .cards-card-body a.button {
