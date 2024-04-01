@@ -291,6 +291,41 @@ const buildImageColumns = (main, document) => {
   combineSubsequentBlocks(main, 'columns');
 };
 
+const buildBanners = (main, document) => {
+  main.querySelectorAll('.banner-bloc').forEach((banner) => {
+    const sectionMeta = WebImporter.DOMUtils.createTable([['Section Metadata'], ['Style', 'Banner Image']], document);
+    banner.after(sectionMeta);
+    sectionMeta.after(document.createElement('hr'));
+  });
+
+  main.querySelectorAll('.blocEnrollBanner').forEach((enrollBanner) => {
+    enrollBanner.querySelector('.blocEnrollBanner__link .mobile').remove();
+
+    const cells = [[...enrollBanner.children]];
+
+    const block = createBlock({
+      blockname: 'Enroll Banner',
+      cells,
+    }, document);
+    block.dataset.originalBlock = 'blocEnrollBanner';
+    enrollBanner.replaceWith(block);
+  });
+
+  main.querySelectorAll('.heroBanner').forEach((hero) => {
+    hero.querySelector('.heroBanner__description .roundButton.mobile').remove();
+
+    const cells = [[...hero.children]];
+
+    const block = createBlock({
+      blockname: 'Hero Banner',
+      cells,
+    }, document);
+    block.dataset.originalBlock = 'heroBanner';
+    hero.replaceWith(block);
+    hero.after(document.createElement('hr'));
+  });
+};
+
 const buildCards = (main, document) => {
   main.querySelectorAll('.row-bloc-three').forEach((el) => {
     const cells = [];
@@ -319,6 +354,21 @@ const buildCards = (main, document) => {
     }, document);
     block.dataset.originalBlock = 'row-bloc-two';
     el.replaceWith(block);
+  });
+
+  main.querySelectorAll('.rowBlocs > .rowBlocs__content').forEach((el) => {
+    const cells = [];
+
+    el.querySelectorAll('.blocPicture').forEach((card) => {
+      cells.push([card.querySelector('.blocPicture__image'), card.querySelector('.blocPicture__description')]);
+    });
+    const block = createBlock({
+      blockname: 'Cards',
+      variants: ['Four Columns'],
+      cells,
+    }, document);
+    block.dataset.originalBlock = 'rowBlocs';
+    el.parentNode.replaceWith(block);
   });
 
   main.querySelectorAll('.push-area').forEach((el) => {
@@ -372,7 +422,7 @@ const buildReport = (main) => {
   });
 
   const potentialBlocks = new Set();
-  const ignoredClasses = ['clearfix', 'box'];
+  const ignoredClasses = ['clearfix', 'box', 'parent'];
   [...main.children].forEach((child) => {
     if (child.tagName === 'DIV') {
       if (child.classList.contains('main_content')) {
@@ -415,6 +465,7 @@ export default {
     metaBlock.dataset.blockName = 'metadata';
     main.prepend(metaBlock);
 
+    buildBanners(main, document);
     buildImageColumns(main, document);
     buildCards(main, document);
     buildVideos(main, document);
