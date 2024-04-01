@@ -101,18 +101,6 @@ const createMetadata = (document) => {
     meta.Description = desc;
   }
 
-  const img = getMetadata('og:image', document);
-  if (img) {
-    const el = document.createElement('img');
-    el.src = img;
-    meta.Image = el;
-
-    const imgAlt = getMetadata('og:image:alt', document);
-    if (imgAlt) {
-      el.alt = imgAlt;
-    }
-  }
-
   const ogtitle = getMetadata('og:title', document);
   if (ogtitle && ogtitle !== meta.Title) {
     if (meta.Title) {
@@ -146,18 +134,6 @@ const createMetadata = (document) => {
       meta['twitter:description'] = tdesc;
     } else {
       meta.Description = tdesc;
-    }
-  }
-
-  const timg = getMetadata('twitter:image', document);
-  if (timg && timg !== img) {
-    const el = document.createElement('img');
-    el.src = timg;
-    meta['twitter:image'] = el;
-
-    const imgAlt = getMetadata('twitter:image:alt', document);
-    if (imgAlt) {
-      el.alt = imgAlt;
     }
   }
 
