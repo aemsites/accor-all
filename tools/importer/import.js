@@ -215,17 +215,22 @@ const buildAccordions = (main, document) => {
 const buildVideos = (main, document) => {
   main.querySelectorAll('.bloc-video').forEach((video) => {
     const cells = [];
-
-    const videoSource = video.querySelector('video source')?.src;
-    if (videoSource) {
-      const sourceUrl = new URL(videoSource);
-      const link = document.createElement('a');
-      link.textContent = `https://all.accor.com${sourceUrl.pathname}`;
-      link.href = `https://all.accor.com${sourceUrl.pathname}`;
-      cells.push([link]);
+    let videoSource;
+    if (video.querySelector('.youtube-video')) {
+      const ytIframe = video.querySelector('iframe[src*="https://www.youtube.com/embed"]');
+      videoSource = ytIframe.src;
+    } else if (video.querySelector('video source')) {
+      const srcUrl = video.querySelector('video source').src;
+      const sourceUrl = new URL(srcUrl);
+      videoSource = `https://all.accor.com${sourceUrl.pathname}`;
     }
 
-    const details = video.querySelector('details');
+    const link = document.createElement('a');
+    link.textContent = videoSource;
+    link.href = videoSource;
+    cells.push([link]);
+
+    const details = video.querySelector('details .details__description');
     if (details) {
       cells.push([details]);
     }
