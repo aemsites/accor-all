@@ -53,7 +53,8 @@ export function rewriteLinkUrl(a) {
   const isHttp = url.protocol === 'https:' || url.protocol === 'http:';
   if (!isHttp) return a;
 
-  if (domainCheck.isKnown) {
+  const ignoredPaths = ['/middleware/'];
+  if (domainCheck.isKnown && !ignoredPaths.some((p) => url.pathname.startsWith(p))) {
     // local links are rewritten to be relative
     a.href = `${url.pathname}${url.search}${url.hash}`;
   } else if (domainCheck.isExternal) {
