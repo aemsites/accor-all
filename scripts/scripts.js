@@ -20,7 +20,6 @@ import {
   linkTextIncludesHref,
   rewriteLinkUrl,
   wrapImgsInLinks,
-  wrapTextNodes,
 } from './utils.js';
 import {
   p,
@@ -73,16 +72,6 @@ function buildAutoBlocks(main, templateModule = undefined) {
 }
 
 /**
- * add block level wrappers to all block content columns
- * @param {Element} main the main element
- */
-function redecorateBlocks(main) {
-  main.querySelectorAll('.block').forEach((block) => {
-    wrapTextNodes(block);
-  });
-}
-
-/**
  * decorate all links, includes creating buttons, making links relative, etc.
  * @param {Element} main the main element
  */
@@ -132,7 +121,6 @@ export function decorateMain(main, templateModule) {
   buildAutoBlocks(main, templateModule);
   decorateSections(main);
   decorateBlocks(main);
-  redecorateBlocks(main);
 }
 
 const validTemplates = [];
