@@ -96,6 +96,10 @@
   color: var(--clr-blue-300);
 }
 
+.video details summary::-webkit-details-marker {
+  display: none;
+}
+
 .video details summary p {
   position: relative;
   padding: 1em;
