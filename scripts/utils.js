@@ -1,4 +1,4 @@
-import { toCamelCase } from './aem.js';
+import { toCamelCase, fetchPlaceholders } from './aem.js';
 
 export const PRODUCTION_DOMAINS = ['all.accor.com'];
 
@@ -156,4 +156,8 @@ export function getConfig(prefix = '', segment = '') {
     });
   }
   return window.hlx.config[segment];
+}
+
+export function fetchLanguagePlaceholders() {
+  return fetchPlaceholders(`/${document.documentElement.lang || 'en'}`);
 }
