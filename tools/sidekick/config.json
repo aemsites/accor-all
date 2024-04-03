@@ -4,7 +4,13 @@
     {
       "id": "tools",
       "title": "Tools",
-      "isContainer": true
+      "isContainer": true,
+      "environments": [
+        "dev",
+        "preview",
+        "live",
+        "edit",
+      ]
     },
     {
       "containerId": "tools",
