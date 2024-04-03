@@ -1,0 +1,74 @@
+.library-metadata-container {
+  position: relative;
+}
+
+.library-metadata {
+  position: absolute;
+  top: .5rem;
+  left: 4px;
+  border-radius: 50%;
+  border: 1px dotted currentcolor;
+  height: 18px;
+  width: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.library-metadata .tooltip {
+  display: none;
+  padding: 1rem;
+}
+
+.library-metadata .tooltip[aria-expanded="true"] {
+  display: block;
+  position: absolute;
+  top: -1.25rem;
+  left: 2.25rem;
+  background-color: var(--clr-white);
+  box-shadow: 4px 4px 4px 4px rgba(0 0 0 / 55%);
+  color: var(--clr-black);
+  z-index: 2;
+  width: 40rem;
+  max-width: 75vw;
+  border-radius: 8px;
+}
+
+@media (width >= 900px) {
+  .library-metadata {
+    top: 1rem;
+    left: 1rem;
+    height: 30px;
+    width: 30px;
+    font-size: 18px;
+  }
+
+  .library-metadata .tooltip[aria-expanded="true"] {
+    top: -1rem;
+    left: 3rem;
+  }
+}
+
+.library-metadata .tooltip h2 {
+  font-size: 24px;
+  line-height: 1.5;
+}
+
+.library-metadata .tooltip p {
+  line-height: 1.5;
+  margin-block: 0 1em;
+  font-size: 18px;
+}
+
+.library-metadata .tooltip[aria-expanded="true"]::before {
+  content: "";
+  position: absolute;
+  border-top: .5rem solid transparent;
+  border-bottom: .5rem solid transparent;
+  border-left: 1rem solid var(--clr-brand-red);
+  rotate: 180deg;
+  left: -1rem;
+  top: 1.25rem;
+}

@@ -20,7 +20,6 @@ import {
   linkTextIncludesHref,
   rewriteLinkUrl,
   wrapImgsInLinks,
-  wrapTextNodes,
 } from './utils.js';
 import {
   p,
@@ -73,16 +72,6 @@ function buildAutoBlocks(main, templateModule = undefined) {
 }
 
 /**
- * add block level wrappers to all block content columns
- * @param {Element} main the main element
- */
-function redecorateBlocks(main) {
-  main.querySelectorAll('.block').forEach((block) => {
-    wrapTextNodes(block);
-  });
-}
-
-/**
  * decorate all links, includes creating buttons, making links relative, etc.
  * @param {Element} main the main element
  */
@@ -132,7 +121,6 @@ export function decorateMain(main, templateModule) {
   buildAutoBlocks(main, templateModule);
   decorateSections(main);
   decorateBlocks(main);
-  redecorateBlocks(main);
 }
 
 const validTemplates = [];
@@ -160,7 +148,24 @@ async function loadTemplate() {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  // init page lang
+  let lang = 'en';
+  const langMeta = getMetadata('language');
+  const localeMeta = getMetadata('locale');
+  if (langMeta) {
+    lang = `${langMeta}${localeMeta ? `-${localeMeta}` : ''}`;
+  } else {
+    // try to infer from path
+    const pathSegments = window.location.pathname.split('/');
+    if (pathSegments.length > 1) {
+      const [, pathLang] = pathSegments;
+      if (/[a-z]{2}(-[a-z]{2})?/.test(pathLang)) {
+        lang = pathLang;
+      }
+    }
+  }
+  document.documentElement.lang = lang.toLowerCase();
+
   decorateTemplateAndTheme();
   const templateModule = await loadTemplate();
   const main = doc.querySelector('main');

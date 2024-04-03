@@ -1,4 +1,4 @@
-import { toCamelCase } from './aem.js';
+import { toCamelCase, fetchPlaceholders } from './aem.js';
 
 export const PRODUCTION_DOMAINS = ['all.accor.com'];
 
@@ -53,7 +53,8 @@ export function rewriteLinkUrl(a) {
   const isHttp = url.protocol === 'https:' || url.protocol === 'http:';
   if (!isHttp) return a;
 
-  if (domainCheck.isKnown) {
+  const ignoredPaths = ['/middleware/'];
+  if (domainCheck.isKnown && !ignoredPaths.some((p) => url.pathname.startsWith(p))) {
     // local links are rewritten to be relative
     a.href = `${url.pathname}${url.search}${url.hash}`;
   } else if (domainCheck.isExternal) {
@@ -126,24 +127,6 @@ export function getOrigin() {
   return window.location.href === 'about:srcdoc' ? window.parent.location.origin : window.location.origin;
 }
 
-/**
- * Wrap inline text content of block cells within a <p> tag.
- * @param {Element} block the block element
- */
-export function wrapTextNodes(block) {
-  block.querySelectorAll(':scope > div > div').forEach((blockColumn) => {
-    if (blockColumn.hasChildNodes()) {
-      const hasWrapper = !!blockColumn.querySelector('picture') /* exclude certain elements from being wrapped */
-        || (!!blockColumn.firstElementChild && window.getComputedStyle(blockColumn.firstElementChild).display === 'block');
-      if (!hasWrapper) {
-        const par = document.createElement('p');
-        while (blockColumn.firstChild) par.appendChild(blockColumn.firstChild);
-        blockColumn.append(par);
-      }
-    }
-  });
-}
-
 export function getConfig(prefix = '', segment = '') {
   window.hlx.config = window.hlx.config || {};
   if (!window.hlx.config[segment]) {
@@ -173,4 +156,8 @@ export function getConfig(prefix = '', segment = '') {
     });
   }
   return window.hlx.config[segment];
+}
+
+export function fetchLanguagePlaceholders() {
+  return fetchPlaceholders(`/${document.documentElement.lang || 'en'}`);
 }
