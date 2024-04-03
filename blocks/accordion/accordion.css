@@ -20,7 +20,7 @@
     list-style: none;
     transition: background-color 0.2s;
     overflow-y: hidden;
-    color: var(--clr-blue-300);
+    color: var(--clr-blue-200);
 }
 
 .accordion details[open] summary {
@@ -44,7 +44,7 @@
     width: 11px;
     height: 11px;
     font-weight: 400;
-    border: 2px solid var(--clr-blue-300);
+    border: 2px solid var(--clr-blue-200);
     border-width: 2px 2px 0 0;
     transition: transform 0.2s;
 }
@@ -68,7 +68,7 @@
 
 .accordion details .accordion-item-body a {
     text-decoration: underline;
-    color: var(--clr-blue-300)
+    color: var(--clr-blue-200)
 }
 
 .accordion details .accordion-item-body ul {

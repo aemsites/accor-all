@@ -29,7 +29,8 @@ img, picture, video, canvas, svg {
   --clr-blue-700: #050033;
   --clr-blue-500: #252339;
   --clr-blue-400: #1e1852;
-  --clr-blue-300: #1264a3;
+  --clr-blue-300: #3d4892;
+  --clr-blue-200: #1264a3;
   --clr-neutral-700: #3e3d48;
   --clr-neutral-500: #6f6e77;
   --clr-neutral-400: #dadadd;
@@ -41,7 +42,7 @@ img, picture, video, canvas, svg {
   --clr-bg: var(--clr-white);
   --clr-text: var(--clr-blue-500);
   --clr-link: var(--clr-blue-400);
-  --clr-link-hover: var(--clr-blue-300);
+  --clr-link-hover: var(--clr-blue-200);
 
   /* fonts */
   --body-font-family: roboto, roboto-fallback;
@@ -117,6 +118,16 @@ h4, h5, h6 {
   scroll-margin: calc(var(--nav-height) + 1em);
 }
 
+h1, h2 {
+  margin-block: 32px;
+}
+
+@media (width >= 900px) {
+  h1, h2 {
+    margin-block: 0 32px;
+  }
+}
+
 h1 { font-size: var(--heading-font-size-700); }
 h2 { font-size: var(--heading-font-size-500); }
 h3 { font-size: var(--heading-font-size-400); }
@@ -126,6 +137,10 @@ h6 { font-size: var(--heading-font-size-200); }
 
 p, dl, ol, ul, pre, blockquote {
   margin-block: 0 1em;
+}
+
+.button-container {
+  margin: 0;
 }
 
 /* links */
@@ -201,7 +216,7 @@ main img {
 /* sections */
 main .section {
   padding-block: 2rem;
-  padding-inline: 1rem;
+  padding-inline: 2rem;
 }
 
 .section > div {

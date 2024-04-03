@@ -114,13 +114,18 @@ function decorateLinks(main) {
  */
 // eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main, templateModule) {
-  // hopefully forward compatible button decoration
+  decorateSections(main);
+  main.querySelectorAll('.section > div').forEach((d) => {
+    d.classList.add('content-wrapper');
+    if (!d.classList.contains('default-content-wrapper')) {
+      d.classList.add('block-content-wrapper');
+    }
+  });
+  buildAutoBlocks(main, templateModule);
+  decorateBlocks(main);
   wrapImgsInLinks(main);
   decorateLinks(main);
   decorateIcons(main);
-  buildAutoBlocks(main, templateModule);
-  decorateSections(main);
-  decorateBlocks(main);
 }
 
 const validTemplates = [];

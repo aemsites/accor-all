@@ -93,7 +93,7 @@
 .video details summary {
   display: list-item;
   list-style-type: none;
-  color: var(--clr-blue-300);
+  color: var(--clr-blue-200);
 }
 
 .video details summary::-webkit-details-marker {
