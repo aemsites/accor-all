@@ -38,6 +38,22 @@ const toClassName = (name) => {
   return '';
 };
 
+const buildSections = (main, document) => {
+  document.querySelectorAll('.one-bloc-no-pics').forEach((content) => {
+    const hasAlignCenter = [...content.children].some((c) => c.getAttribute('style')?.includes('text-align: center;'));
+    if (!hasAlignCenter) {
+      const section = document.createElement('div');
+      content.before(section);
+      section.append(content);
+
+      const sectionMeta = WebImporter.DOMUtils.createTable([['Section Metadata'], ['Style', 'align-left']], document);
+      section.append(sectionMeta);
+      section.prepend(document.createElement('hr'));
+      section.append(document.createElement('hr'));
+    }
+  });
+};
+
 const convertBlocksToTables = (main, document) => {
   main.querySelectorAll('.block').forEach((block) => {
     const cells = [];
@@ -273,12 +289,6 @@ const buildImageColumns = (main, document) => {
 };
 
 const buildBanners = (main, document) => {
-  main.querySelectorAll('.banner-bloc').forEach((banner) => {
-    const sectionMeta = WebImporter.DOMUtils.createTable([['Section Metadata'], ['Style', 'Banner Image']], document);
-    banner.after(sectionMeta);
-    sectionMeta.after(document.createElement('hr'));
-  });
-
   main.querySelectorAll('.blocEnrollBanner').forEach((enrollBanner) => {
     enrollBanner.querySelector('.blocEnrollBanner__link .mobile').remove();
 
@@ -451,6 +461,7 @@ export default {
     buildCards(main, document);
     buildVideos(main, document);
     buildAccordions(main, document);
+    buildSections(main, document);
 
     convertBlocksToTables(main, document);
 

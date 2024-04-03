@@ -209,10 +209,6 @@ main .section {
   margin-inline: auto;
 }
 
-main .section div[data-align="justify"] p {
-  text-align: justify;
-}
-
 @media (width >= 600px) {
   main .section {
     padding-block: 4rem;
@@ -233,6 +229,27 @@ main .default-content-wrapper :is(h1, h2, h3, h4, h5, h6) {
   text-wrap: balance;
 }
 
+main .default-content-wrapper p {
+  text-align: center;
+}
+
+main .left-align .default-content-wrapper p {
+  text-align: left;
+}
+
+main .default-content-wrapper li {
+  margin-inline: auto;
+  width: max-content;
+}
+
+main .left-align .default-content-wrapper li {
+  margin-inline: unset;
+}
+
 main .default-content-wrapper picture img {
   border-radius: 6px;
+}
+
+main .section div[data-align="justify"] p {
+  text-align: justify;
 }
