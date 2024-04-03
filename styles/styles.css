@@ -209,7 +209,7 @@ main .section {
   margin-inline: auto;
 }
 
-main .section div[data-align="justify"] p{
+main .section div[data-align="justify"] p {
   text-align: justify;
 }
 
@@ -228,6 +228,11 @@ main .section div[data-align="justify"] p{
   }
 }
 
-main .default-content-wrapper {
+main .default-content-wrapper :is(h1, h2, h3, h4, h5, h6) {
   text-align: center;
+  text-wrap: balance;
+}
+
+main .default-content-wrapper picture img {
+  border-radius: 6px;
 }
