@@ -1,0 +1,39 @@
+main .enroll-banner {
+  background: var(--clr-blue-300);
+  color: var(--clr-white);
+  padding: 2rem 2.25rem;
+}
+
+main .enroll-banner > div {
+  display: flex;
+  gap: 2rem;
+  flex-direction: column;
+  text-align: center;
+}
+
+
+main .enroll-banner a.button {
+  width: 100%;
+  background-color: var(--clr-white);
+  color: var(--clr-blue-400);
+  padding: .625rem 2rem;
+  margin: 0;
+}
+
+@media (width >= 900px) {
+  main .enroll-banner {
+    padding: 2rem 5.188rem;
+  }
+
+  main .enroll-banner > div {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  main .enroll-banner .button-container {
+    display: grid;
+    grid-template-columns: max-content;
+    place-content: center;
+    height: 100%;
+  }
+}
