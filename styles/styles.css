@@ -248,7 +248,7 @@ main .default-content-wrapper p {
   text-align: center;
 }
 
-main .left-align .default-content-wrapper p {
+main .align-left .default-content-wrapper p {
   text-align: left;
 }
 
@@ -257,7 +257,7 @@ main .default-content-wrapper li {
   width: max-content;
 }
 
-main .left-align .default-content-wrapper li {
+main .align-left .default-content-wrapper li {
   margin-inline: unset;
 }
 
