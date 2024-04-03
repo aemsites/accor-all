@@ -127,7 +127,8 @@ export default async function decorate(block) {
     placeholder.classList.add('video-placeholder');
     videoOverlay.append(placeholder);
     block.classList.add('with-placeholder');
-  } else if (videoType.type === 'mp4') {
+  }
+  if (videoType.type === 'mp4') {
     const langPlaceholders = await fetchLanguagePlaceholders();
 
     const details = domEl(
