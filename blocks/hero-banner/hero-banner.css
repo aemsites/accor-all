@@ -1,1 +1,28 @@
-/* nothin */
+main .hero-banner .hero-content {
+  background: #050033;
+  border-radius: .375rem;
+  color: #fff;
+  margin: -2.5rem 1rem 0;
+  padding: 3rem;
+  position: relative;
+}
+
+main .hero-banner a.button {
+  background-color: transparent;
+  border-color: var(--clr-white);
+  padding: .625rem 2rem;
+  margin: 0;
+}
+
+@media (width >= 600px) {
+  main .hero-banner .hero-content {
+    margin: -3.75rem 5.063rem 0;
+  }
+}
+
+@media (width >= 900px) {
+  main .hero-banner .hero-content {
+    margin: -6.25rem 4rem 0 auto;
+    width: 37.125rem;
+  }
+}

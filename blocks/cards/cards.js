@@ -18,7 +18,10 @@ export default function decorate(block) {
     });
     ul.append(li);
   });
-  ul.querySelectorAll('img').forEach((img) => img.closest('picture').replaceWith(createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }])));
-  block.textContent = '';
-  block.append(ul);
+  ul.querySelectorAll('img').forEach((img) => {
+    const pic = img.closest('picture');
+    const optimizedPic = createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }]);
+    pic.replaceWith(optimizedPic);
+  });
+  block.replaceChildren(ul);
 }

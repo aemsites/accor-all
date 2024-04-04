@@ -219,10 +219,14 @@ main .section {
   padding-inline: 2rem;
 }
 
-.section > div {
+main .section .content-wrapper {
   max-width: var(--content-max-width);
   margin-inline: auto;
 }
+
+main .section .block-content-wrapper {
+  margin-block: 0 4rem;
+} 
 
 @media (width >= 600px) {
   main .section {
