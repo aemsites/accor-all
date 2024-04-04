@@ -5,9 +5,22 @@ import { div, nav, button } from '../../scripts/dom-helpers.js';
 // media query match that indicates mobile/tablet width
 const isMobile = window.matchMedia('(max-width: 600px)');
 
+const toggleNavSection = (navDrop, expanded) => {
+  const navControlButton = navDrop.querySelector(':scope > button');
+  const subList = navDrop.querySelector(':scope > ul');
+  navControlButton.setAttribute('aria-expanded', expanded);
+  subList.querySelectorAll('li > a').forEach((navLink) => {
+    if (!expanded) {
+      navLink.setAttribute('tabindex', -1);
+    } else {
+      navLink.removeAttribute('tabindex');
+    }
+  });
+};
+
 const toggleAllNavSections = (navUl, expanded = false) => {
-  navUl.querySelectorAll('li.nav-drop > button').forEach((section) => {
-    section.setAttribute('aria-expanded', expanded);
+  navUl.querySelectorAll('li.nav-drop').forEach((navSection) => {
+    toggleNavSection(navSection, expanded);
   });
 };
 
@@ -32,11 +45,16 @@ const decorateNav = (navSection) => {
           if (isMobile.matches) {
             const expanded = dropButton.getAttribute('aria-expanded') === 'true';
             toggleAllNavSections(navUl);
-            dropButton.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+            toggleNavSection(li, !expanded);
           }
         });
       }
     });
+
+    isMobile.addEventListener('change', () => {
+      toggleAllNavSections(navUl, !isMobile.matches);
+    });
+    toggleAllNavSections(navUl, !isMobile.matches);
   }
 };
 

@@ -150,14 +150,36 @@ footer .footer .footer-nav .nav-drop > button[aria-expanded="false"] + ul {
   margin-block: 0;
 }
 
+@media (width >= 600px) {
+  footer .footer .footer-nav .nav-drop button::before,
+  footer .footer .footer-nav .nav-drop button::after { 
+    content: none;
+  }
+
+  footer .footer .footer-nav nav > ul {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  footer .footer .footer-nav .nav-drop {
+    flex-basis: 225px;
+    margin-block: 24px;
+  }
+
+  footer .footer .footer-nav .nav-drop:not(:last-child) {
+    border-bottom: none;
+  }
+}
+
 /* social */
 
 /* stylelint-disable-next-line no-descending-specificity */
-footer .footer .footer-social ul {
+footer .footer .footer-social .default-content-wrapper ul {
   display: flex;
   justify-content: space-around;
   align-items: center;
   margin-block: 1rem;
+  gap: 2.5rem;
 }
 
 footer .footer .footer-social .icon {
@@ -167,6 +189,20 @@ footer .footer .footer-social .icon {
 
 footer .footer .footer-social .icon.icon-tripadvisor {
   width: 120px;
+}
+
+@media (width >= 600px) {
+  footer .footer .footer-social .default-content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2.5rem;
+  }
+
+  footer .footer .footer-social .default-content-wrapper > * {
+    flex-shrink: 0;
+    flex-grow: 0;
+  }
 }
 
 /* legal links */
@@ -190,6 +226,21 @@ footer .footer .footer-legal ul > li > a {
   display: block;
 }
 
+@media (width >= 600px) {
+  footer .footer .footer-legal ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  footer .footer .footer-legal ul > li {
+    flex: 1 1 max-content;
+  }
+}
+
 /* copyright */
 footer .footer .footer-copyright.section {
   margin-top: 1rem;
@@ -201,6 +252,15 @@ footer .footer .footer-copyright a {
   font-size: 14px;
   color: #8d88b4;
   text-decoration: none;
+}
+
+@media (width >= 600px) {
+  footer .footer .footer-copyright .default-content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+  }
 }
 
 /* legal logos */
