@@ -61,8 +61,8 @@ export default async function decorate(block) {
   const navEl = block.querySelector(`#${navToggler.getAttribute('aria-controls')}`);
   navToggler.addEventListener('click', () => toggleMenu(navEl, navToggler));
   // prevent mobile nav behavior on window resize
-  toggleMenu(navEl, navToggler, isDesktop.matches);
-  isDesktop.addEventListener('change', () => toggleMenu(navEl, navToggler, isDesktop.matches));
+  // toggleMenu(navEl, navToggler, isDesktop.matches);
+  // isDesktop.addEventListener('change', () => toggleMenu(navEl, navToggler, isDesktop.matches));
 
   const login = block.querySelector('.ace-header-navigation__loginconnect');
   if (login) {
