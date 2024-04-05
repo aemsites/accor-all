@@ -40,6 +40,7 @@ function buildFragmentBlocks(main) {
     if (domainCheck.isKnown && linkTextIncludesHref(a) && url.pathname.includes('/fragments/')) {
       const block = buildBlock('fragment', p(a.cloneNode(true)));
       a.replaceWith(block);
+      decorateBlock(block);
     }
   });
 }
