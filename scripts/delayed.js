@@ -21,48 +21,49 @@ function loadGoogleTagManager(config) {
   }
 }
 
-function OTLoaded() {
-  if (window.OnetrustActiveGroups) {
-    const activeGroups = window.OnetrustActiveGroups.split(',');
-    // eslint-disable-next-line no-console
-    console.log(`OneTrust Loaded. Active groups: ${activeGroups}`);
-    // use active groups to determine what else is loaded
-    // if blocks need to rely on this
-    // we could send an event here that blocks could listen on to trigger their loading.
-    // if (activeGroups.includes('C0004')) {
-    //
-    // }
-  }
-}
-
 async function loadOneTrust(config) {
   const { onetrustId } = config;
   if (onetrustId) {
-    window.OptanonWrapper = OTLoaded;
+    window.OptanonWrapper = () => {
+      if (window.OnetrustActiveGroups) {
+        const activeGroups = window.OnetrustActiveGroups.split(',');
+        // eslint-disable-next-line no-console
+        console.log(`OneTrust Loaded. Active groups: ${activeGroups}`);
+      }
+
+      const bannerLoadedEvent = new Event('banner-loaded');
+      window.dispatchEvent(bannerLoadedEvent);
+    };
 
     await loadScript('https://cdn.cookielaw.org/scripttemplates/otSDKStub.js', {
       type: 'text/javascript',
       charset: 'UTF-8',
       'data-domain-script': onetrustId,
+      'data-document-language': 'true',
     });
   }
 }
 
-const execLoad = async () => {
+/**
+ * execute all the delayed stuff.
+ * This is in a function to avoid issues around top-level await
+ */
+const execDelayed = async () => {
   // Core Web Vitals RUM collection
   sampleRUM('cwv');
 
   const browserDomain = checkBrowserDomain();
   const isLibrary = document.body.classList.contains('sidekick-library');
   if (!isLibrary && !browserDomain.isPreview) {
+    // load martec stack
     const config = await getConfig();
-    // add more delayed functionality here
     await loadOneTrust(config);
     loadGoogleTagManager(config);
+    await loadScript('https://cdn.evgnet.com/beacon/accorsa/accor/scripts/evergage.min.js');
   }
 
   // add more delayed functionality here
   flushFragmentCache();
 };
 
-execLoad();
+execDelayed();
