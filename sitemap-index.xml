@@ -6,4 +6,52 @@
     <sitemap>
         <loc>https://all.accor.com/sitemap-fr.xml</loc>
     </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-ar.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-de.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-es.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-id.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-it.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-ja.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-ko.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-nl.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-pl.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-pt.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-pt-br.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-ru.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-th.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-tr.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-vi.xml</loc>
+    </sitemap>
+    <sitemap>
+        <loc>https://all.accor.com/sitemap-zh.xml</loc>
+    </sitemap>
 </sitemapindex>
