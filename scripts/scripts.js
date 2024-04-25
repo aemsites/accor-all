@@ -1,8 +1,6 @@
 import {
   sampleRUM,
   buildBlock,
-  loadHeader,
-  loadFooter,
   decorateSections,
   decorateBlocks,
   decorateTemplateAndTheme,
@@ -227,24 +225,31 @@ async function loadEager(doc) {
   }
 }
 
-function loadHeaderAndFooter(doc) {
+async function loadHeaderAndFooter(doc) {
   const header = doc.querySelector('header');
   const footer = doc.querySelector('footer');
 
   header.style.visibility = 'hidden';
   footer.style.visibility = 'hidden';
 
-  const headerLoaded = loadHeader(header);
-  const footerLoaded = loadFooter(footer);
+  const lang = getMetadata('language') || 'en';
+  const contentResp = await fetch(`https://all.accor.com/a/${lang}.html`);
+  if (contentResp.ok) {
+    const markup = await contentResp.text();
+    const dp = new DOMParser();
+    const dom = dp.parseFromString(markup, 'text/html');
+    const accorHeader = dom.querySelector('.ace-header-container');
+    const accorFooter = dom.querySelector('.shared-footer');
 
-  headerLoaded.then(() => {
-    header.style.visibility = null;
-  });
-  footerLoaded.then(() => {
+    header.append(accorHeader);
+
+    const footerBlock = buildBlock('footer', '');
+    footerBlock.append(accorFooter);
+    footer.append(footerBlock);
+    decorateBlock(footerBlock);
+    await loadBlock(footerBlock);
     footer.style.visibility = null;
-  });
-
-  return Promise.all([headerLoaded, footerLoaded]);
+  }
 }
 
 async function downloadIcons(doc) {

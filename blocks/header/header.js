@@ -1,4 +1,4 @@
-import { loadScript } from '../../scripts/aem.js';
+import { loadScript, getMetadata } from '../../scripts/aem.js';
 import { div } from '../../scripts/dom-helpers.js';
 
 // media query match that indicates mobile/tablet width
@@ -13,8 +13,7 @@ function toggleMenu(navEl, navToggler, forceExpanded = null) {
 async function fetchHeaderContent() {
   let html = '';
   try {
-    // TODO assign from metadata?
-    const lang = 'en';
+    const lang = getMetadata('language') || 'en';
     const market = 'en_usa';
 
     const resp = await fetch(`https://all.accor.com/a/content/experience-fragments/all/header/navigation/${lang}/${market}/jcr:content.content.nocache.html`);

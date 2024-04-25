@@ -1,92 +1,22 @@
-import { getMetadata, toClassName } from '../../scripts/aem.js';
-import { loadFragment } from '../fragment/fragment.js';
-import { div, nav, button } from '../../scripts/dom-helpers.js';
-
-// media query match that indicates mobile/tablet width
-const isMobile = window.matchMedia('(max-width: 600px)');
-
-const toggleNavSection = (navDrop, expanded) => {
-  const navControlButton = navDrop.querySelector(':scope > button');
-  const subList = navDrop.querySelector(':scope > ul');
-  navControlButton.setAttribute('aria-expanded', expanded);
-  subList.querySelectorAll('li > a').forEach((navLink) => {
-    if (!expanded) {
-      navLink.setAttribute('tabindex', -1);
-    } else {
-      navLink.removeAttribute('tabindex');
-    }
-  });
-};
-
-const toggleAllNavSections = (navUl, expanded = false) => {
-  navUl.querySelectorAll('li.nav-drop').forEach((navSection) => {
-    toggleNavSection(navSection, expanded);
-  });
-};
-
-const decorateNav = (navSection) => {
-  if (!navSection) return;
-
-  const navUl = navSection.querySelector('ul');
-  if (navUl) {
-    const navEl = nav({ 'aria-label': 'footer-nav' }, navUl);
-    navSection.replaceChildren(navEl);
-    navUl.querySelectorAll(':scope > li').forEach((li, idx) => {
-      const subList = li.querySelector(':scope > ul');
-      if (subList) {
-        const textNodes = [...li.childNodes].filter((node) => node.nodeType === Node.TEXT_NODE);
-        const liText = textNodes.map((text) => text.textContent).join('').trim();
-        const dropButton = button({ type: 'button', 'aria-expanded': false, 'aria-controls': `drop-${toClassName(liText)}-${idx}` }, liText);
-        li.prepend(dropButton);
-        textNodes.forEach((text) => text.remove());
-        li.classList.add('nav-drop');
-        subList.setAttribute('id', `drop-${toClassName(liText)}-${idx}`);
-        dropButton.addEventListener('click', () => {
-          if (isMobile.matches) {
-            const expanded = dropButton.getAttribute('aria-expanded') === 'true';
-            toggleAllNavSections(navUl);
-            toggleNavSection(li, !expanded);
-          }
-        });
-      }
-    });
-
-    isMobile.addEventListener('change', () => {
-      toggleAllNavSections(navUl, !isMobile.matches);
-    });
-    toggleAllNavSections(navUl, !isMobile.matches);
-  }
-};
+import { loadScript } from '../../scripts/aem.js';
+import { div } from '../../scripts/dom-helpers.js';
 
 /**
  * loads and decorates the footer
  * @param {Element} block The footer block element
  */
 export default async function decorate(block) {
-  const footerMeta = getMetadata('footer');
-  block.textContent = '';
+  const footerInside = block.querySelector('footer.footerComponent');
+  const replacementDiv = div();
+  [...footerInside.attributes].forEach((attr) => {
+    replacementDiv.setAttribute(attr.name, attr.value);
+  });
+  replacementDiv.append(...footerInside.children);
+  footerInside.before(replacementDiv);
+  footerInside.remove();
 
-  // load footer fragment
-  const footerPath = footerMeta.footer || '/fragments/footer';
-  const fragment = await loadFragment(footerPath);
-  if (fragment) {
-    // decorate footer DOM
-    const footer = div({ class: 'footer-content' });
-    const sectionNames = ['logo', 'nav', 'social', 'legal', 'copyright', 'logos'];
-    let i = 0;
-    while (fragment.firstElementChild) {
-      fragment.firstElementChild.classList.add(`footer-${sectionNames[i]}`);
-      footer.append(fragment.firstElementChild);
-      i += 1;
-    }
-    decorateNav(footer.querySelector('.footer-nav'));
-
-    // remove buttons
-    footer.querySelectorAll('.button-container').forEach((btnCtn) => {
-      btnCtn.classList.remove('.button-container');
-      btnCtn.querySelectorAll('.button').forEach((btn) => btn.classList.remove('button'));
-    });
-
-    block.append(footer);
-  }
+  block.querySelectorAll('script').forEach((s) => {
+    const { src } = s;
+    loadScript(src);
+  });
 }
