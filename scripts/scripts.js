@@ -225,6 +225,29 @@ async function loadEager(doc) {
   }
 }
 
+async function fetchHeaderFooterContent() {
+  let html = '';
+  try {
+    const lang = getMetadata('language') || 'en';
+    const resp = await fetch(`https://all.accor.com/a/${lang}.html`);
+    html = await resp.text();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to fetch accor html (likely due to CORS). Falling back to local.', e);
+  }
+  if (!html) {
+    const resp = await fetch(`${window.hlx.codeBasePath}/blocks/header/accor-en-fallback.html`);
+    if (resp.ok) {
+      html = await resp.text();
+    }
+  }
+
+  const dp = new DOMParser();
+  const doc = dp.parseFromString(html, 'text/html');
+
+  return doc;
+}
+
 async function loadHeaderAndFooter(doc) {
   const header = doc.querySelector('header');
   const footer = doc.querySelector('footer');
@@ -232,24 +255,18 @@ async function loadHeaderAndFooter(doc) {
   header.style.visibility = 'hidden';
   footer.style.visibility = 'hidden';
 
-  const lang = getMetadata('language') || 'en';
-  const contentResp = await fetch(`https://all.accor.com/a/${lang}.html`);
-  if (contentResp.ok) {
-    const markup = await contentResp.text();
-    const dp = new DOMParser();
-    const dom = dp.parseFromString(markup, 'text/html');
-    const accorHeader = dom.querySelector('.ace-header-container');
-    const accorFooter = dom.querySelector('.shared-footer');
+  const dom = await fetchHeaderFooterContent();
 
-    header.append(accorHeader);
+  const accorHeader = dom.querySelector('.ace-header-container');
+  header.append(accorHeader);
 
-    const footerBlock = buildBlock('footer', '');
-    footerBlock.append(accorFooter);
-    footer.append(footerBlock);
-    decorateBlock(footerBlock);
-    await loadBlock(footerBlock);
-    footer.style.visibility = null;
-  }
+  const accorFooter = dom.querySelector('.shared-footer');
+  const footerBlock = buildBlock('footer', '');
+  footerBlock.append(accorFooter);
+  footer.append(footerBlock);
+  decorateBlock(footerBlock);
+  await loadBlock(footerBlock);
+  footer.style.visibility = null;
 }
 
 async function downloadIcons(doc) {
