@@ -15,8 +15,9 @@ export default async function decorate(block) {
   footerInside.before(replacementDiv);
   footerInside.remove();
 
-  block.querySelectorAll('script').forEach((s) => {
-    const { src } = s;
+  block.querySelectorAll('script').forEach((script) => {
+    const { src } = script;
+    script.remove();
     loadScript(src);
   });
 }

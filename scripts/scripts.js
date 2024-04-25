@@ -236,7 +236,7 @@ async function fetchHeaderFooterContent() {
     console.error('Failed to fetch accor html (likely due to CORS). Falling back to local.', e);
   }
   if (!html) {
-    const resp = await fetch(`${window.hlx.codeBasePath}/blocks/header/accor-en-fallback.html`);
+    const resp = await fetch(`${window.hlx.codeBasePath}/blocks/accor-header/accor-en-fallback.html`);
     if (resp.ok) {
       html = await resp.text();
     }
@@ -244,6 +244,18 @@ async function fetchHeaderFooterContent() {
 
   const dp = new DOMParser();
   const doc = dp.parseFromString(html, 'text/html');
+
+  // make all refs absolute
+  const resetAttributeBase = (tag, attr) => {
+    doc.querySelectorAll(`${tag}[${attr}^="/"]`).forEach((elem) => {
+      elem[attr] = new URL(elem.getAttribute(attr), 'https://all.accor.com').href;
+    });
+  };
+  resetAttributeBase('a', 'href');
+  resetAttributeBase('img', 'src');
+  resetAttributeBase('source', 'srcset');
+  resetAttributeBase('script', 'src');
+  resetAttributeBase('link', 'href');
 
   return doc;
 }
@@ -258,11 +270,16 @@ async function loadHeaderAndFooter(doc) {
   const dom = await fetchHeaderFooterContent();
 
   const accorHeader = dom.querySelector('.ace-header-container');
-  header.append(accorHeader);
+  const headerBlock = buildBlock('accor-header', '');
+  headerBlock.replaceChildren(accorHeader);
+  header.append(headerBlock);
+  decorateBlock(headerBlock);
+  await loadBlock(headerBlock);
+  header.style.visibility = null;
 
   const accorFooter = dom.querySelector('.shared-footer');
   const footerBlock = buildBlock('footer', '');
-  footerBlock.append(accorFooter);
+  footerBlock.replaceChildren(accorFooter);
   footer.append(footerBlock);
   decorateBlock(footerBlock);
   await loadBlock(footerBlock);
