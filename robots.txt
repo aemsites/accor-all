@@ -17,3 +17,6 @@ Disallow: /*/mini.shtml
 Disallow: /newsletter/
 Disallow: /geo/
 Disallow: /errors/others/index.*.jshtml
+
+# Website Sitemap
+Sitemap: https://all.accor.com/sitemap-index.xml
