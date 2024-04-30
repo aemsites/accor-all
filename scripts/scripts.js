@@ -1,8 +1,6 @@
 import {
   sampleRUM,
   buildBlock,
-  loadHeader,
-  loadFooter,
   decorateSections,
   decorateBlocks,
   decorateTemplateAndTheme,
@@ -227,24 +225,65 @@ async function loadEager(doc) {
   }
 }
 
-function loadHeaderAndFooter(doc) {
+async function fetchHeaderFooterContent() {
+  let html = '';
+  try {
+    const lang = getMetadata('language') || 'en';
+    const resp = await fetch(`https://all.accor.com/a/${lang}.html`);
+    html = await resp.text();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to fetch accor html (likely due to CORS). Falling back to local.', e);
+  }
+  if (!html) {
+    const resp = await fetch(`${window.hlx.codeBasePath}/blocks/accor-header/accor-en-fallback.html`);
+    if (resp.ok) {
+      html = await resp.text();
+    }
+  }
+
+  const dp = new DOMParser();
+  const doc = dp.parseFromString(html, 'text/html');
+
+  // make all refs absolute
+  const resetAttributeBase = (tag, attr) => {
+    doc.querySelectorAll(`${tag}[${attr}^="/"]`).forEach((elem) => {
+      elem[attr] = new URL(elem.getAttribute(attr), 'https://all.accor.com').href;
+    });
+  };
+  resetAttributeBase('a', 'href');
+  resetAttributeBase('img', 'src');
+  resetAttributeBase('source', 'srcset');
+  resetAttributeBase('script', 'src');
+  resetAttributeBase('link', 'href');
+
+  return doc;
+}
+
+async function loadHeaderAndFooter(doc) {
   const header = doc.querySelector('header');
   const footer = doc.querySelector('footer');
 
   header.style.visibility = 'hidden';
   footer.style.visibility = 'hidden';
 
-  const headerLoaded = loadHeader(header);
-  const footerLoaded = loadFooter(footer);
+  const dom = await fetchHeaderFooterContent();
 
-  headerLoaded.then(() => {
-    header.style.visibility = null;
-  });
-  footerLoaded.then(() => {
-    footer.style.visibility = null;
-  });
+  const accorHeader = dom.querySelector('.ace-header-container');
+  const headerBlock = buildBlock('accor-header', '');
+  headerBlock.replaceChildren(accorHeader);
+  header.append(headerBlock);
+  decorateBlock(headerBlock);
+  await loadBlock(headerBlock);
+  header.style.visibility = null;
 
-  return Promise.all([headerLoaded, footerLoaded]);
+  const accorFooter = dom.querySelector('.shared-footer');
+  const footerBlock = buildBlock('footer', '');
+  footerBlock.replaceChildren(accorFooter);
+  footer.append(footerBlock);
+  decorateBlock(footerBlock);
+  await loadBlock(footerBlock);
+  footer.style.visibility = null;
 }
 
 async function downloadIcons(doc) {
