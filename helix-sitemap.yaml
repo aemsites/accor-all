@@ -1,0 +1,111 @@
+sitemaps:
+  accor:
+    default: en
+    languages:
+      en:
+        source: /en/query-index.json
+        destination: /sitemap-en.xml
+        hreflang: en
+        lastmod: YYYY-MM-DD
+      fr:
+        source: /fr/query-index.json
+        destination: /sitemap-fr.xml
+        hreflang: fr
+        alternate: /fr/{path}
+        lastmod: YYYY-MM-DD
+      ar:
+        source: /ar/query-index.json
+        destination: /sitemap-ar.xml
+        hreflang: ar
+        alternate: /ar/{path}
+        lastmod: YYYY-MM-DD
+      de:
+        source: /de/query-index.json
+        destination: /sitemap-de.xml
+        hreflang: de
+        alternate: /de/{path}
+        lastmod: YYYY-MM-DD
+      es:
+        source: /es/query-index.json
+        destination: /sitemap-es.xml
+        hreflang: es
+        alternate: /es/{path}
+        lastmod: YYYY-MM-DD
+      id:
+        source: /id/query-index.json
+        destination: /sitemap-id.xml
+        hreflang: id
+        alternate: /id/{path}
+        lastmod: YYYY-MM-DD
+      it:
+        source: /it/query-index.json
+        destination: /sitemap-it.xml
+        hreflang: it
+        alternate: /it/{path}
+        lastmod: YYYY-MM-DD
+      ja:
+        source: /ja/query-index.json
+        destination: /sitemap-ja.xml
+        hreflang: ja
+        alternate: /ja/{path}
+        lastmod: YYYY-MM-DD
+      ko:
+        source: /ko/query-index.json
+        destination: /sitemap-ko.xml
+        hreflang: ko
+        alternate: /ko/{path}
+        lastmod: YYYY-MM-DD
+      nl:
+        source: /nl/query-index.json
+        destination: /sitemap-nl.xml
+        hreflang: nl
+        alternate: /nl/{path}
+        lastmod: YYYY-MM-DD
+      pl:
+        source: /pl/query-index.json
+        destination: /sitemap-pl.xml
+        hreflang: pl
+        alternate: /pl/{path}
+        lastmod: YYYY-MM-DD
+      pt:
+        source: /pt/query-index.json
+        destination: /sitemap-pt.xml
+        hreflang: pt
+        alternate: /pt/{path}
+        lastmod: YYYY-MM-DD
+      pt-br:
+        source: /pt-br/query-index.json
+        destination: /sitemap-pt-br.xml
+        hreflang: pt-br
+        alternate: /pt-br/{path}
+        lastmod: YYYY-MM-DD
+      ru:
+        source: /ru/query-index.json
+        destination: /sitemap-ru.xml
+        hreflang: ru
+        alternate: /ru/{path}
+        lastmod: YYYY-MM-DD
+      th:
+        source: /th/query-index.json
+        destination: /sitemap-th.xml
+        hreflang: th
+        alternate: /th/{path}
+        lastmod: YYYY-MM-DD
+      tr:
+        source: /tr/query-index.json
+        destination: /sitemap-tr.xml
+        hreflang: tr
+        alternate: /tr/{path}
+        lastmod: YYYY-MM-DD
+      vi:
+        source: /vi/query-index.json
+        destination: /sitemap-vi.xml
+        hreflang: vi
+        alternate: /vi/{path}
+        lastmod: YYYY-MM-DD
+      zh:
+        source: /zh/query-index.json
+        destination: /sitemap-zh.xml
+        hreflang: zh
+        alternate: /zh/{path}
+        lastmod: YYYY-MM-DD
